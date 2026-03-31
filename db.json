@@ -1,0 +1,8 @@
+{
+    "rooms": {
+        "Throne Room": {
+            "id": "throne-room",
+            "description": "A grand room with a majestic throne on a raised platform on one end."
+        }
+    }
+}
