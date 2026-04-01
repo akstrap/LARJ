@@ -1,8 +1,49 @@
 {
-    "rooms": {
-        "Throne Room": {
-            "id": "throne-room",
-            "description": "A grand room with a majestic throne on a raised platform on one end."
+    "locations": {
+        "Castle": {
+            "Throne Room": {
+                "id": "throne-room",
+                "description": "A grand room with a majestic throne on a raised platform on one end."
+            },
+            "Bedroom": {
+                "id": "bedroom",
+                "description": "A lavish royal bedchamber. The curtained bed sits in the middle of the room."
+            },
+            "Bathroom": {
+                "id": "bathroom",
+                "description": "An elegant bathroom with gilded appliances."
+            },
+            "Courtyard": {
+                "id": "courtyard",
+                "description": "A beautifully planted yard with a fountain in the middle and a hedge maze."
+            }
+        },
+        "Wooden Shack": {
+            "Interior": {
+                "id": "interior",
+                "description": "A worn-down room with counters covered in items. One wall is entirely bookcases."
+            },
+            "Yard": {
+                "id": "yard",
+                "description": "A small outdoor space enclosed by fences. There is a garden bed in one half."
+            },
+            "Forest": {
+                "id": "forest",
+                "description": "An old forest with huge trees and deep undergrowth."
+            }
+        },
+        "Village Square": {
+            "Square": {
+                "id": "vilage-square",
+                "description": "A central area of a village that is very empty. There is a large statue in the center."
+            },
+            "Food Stall": {
+                "id": "food-stall",
+                "description": "A wooden stall that advertises food for sale. There is no one here."
+            },
+            "Blacksmith": {
+                "id": "blacksmith",
+                "description": "A clearly well used smithy. Tools have been left around, there appear to still be some coals alive in the furnace."
+            }
         }
-    }
 }
