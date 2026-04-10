@@ -1,50 +1,215 @@
 {
     "locations": {
-        "Castle": {
-            "Throne Room": {
-                "id": "throne-room",
-                "description": "A grand room with a majestic throne on a raised platform on one end."
-            },
-            "Bedroom": {
-                "id": "bedroom",
-                "description": "A lavish royal bedchamber. The curtained bed sits in the middle of the room."
-            },
-            "Bathroom": {
-                "id": "bathroom",
-                "description": "An elegant bathroom with gilded appliances."
-            },
-            "Courtyard": {
-                "id": "courtyard",
-                "description": "A beautifully planted yard with a fountain in the middle and a hedge maze."
-            }
+        "castle": {
+            "id": "castle",
+            "name": "Castle",
+            "rooms": ["great-hall", "throne-room", "bedroom", "bathroom", "courtyard"]
         },
-        "Wooden Shack": {
-            "Interior": {
-                "id": "interior",
-                "description": "A worn-down room with counters covered in items. One wall is entirely bookcases."
-            },
-            "Yard": {
-                "id": "yard",
-                "description": "A small outdoor space enclosed by fences. There is a garden bed in one half."
-            },
-            "Forest": {
-                "id": "forest",
-                "description": "An old forest with huge trees and deep undergrowth."
-            }
+        "wooden-shack": {
+            "id": "wooden-shack",
+            "name": "Wooden Shack",
+            "rooms": ["interior", "yard", "forest"]
         },
-        "Village Square": {
-            "Square": {
-                "id": "vilage-square",
-                "description": "A central area of a village that is very empty. There is a large statue in the center."
-            },
-            "Food Stall": {
-                "id": "food-stall",
-                "description": "A wooden stall that advertises food for sale. There is no one here."
-            },
-            "Blacksmith": {
-                "id": "blacksmith",
-                "description": "A clearly well used smithy. Tools have been left around, there appear to still be some coals alive in the furnace."
-            }
+        "village-square": {
+            "id": "village-square",
+            "name": "Village Square",
+            "rooms": ["square", "food-stall", "blacksmith"]
         }
+    },
+    "rooms": {
+        "room": {
+            "id": "room",
+            "name": "?",
+            "description": "A small dimly lit room. There is a knob on the wall next to the single door.",
+            "exits": {
+                "west": "unknown"
+            },
+            "contents": ["knob"]
+        },
+        "great-hall": {
+            "id": "great-hall",
+            "name": "Great Hall",
+            "description": "An expansive main room with a huge table in the middle surrounded by chairs",
+            "exits": {
+                "east": "room",
+                "west": "throne-room",
+                "north": "courtyard",
+                "south": "bathroom"
+            },
+            "contents": ["chair", "table"]
+        },
+        "throne-room": {
+            "id": "throne-room",
+            "name": "Throne Room",
+            "description": "A grand room with a majestic throne on a raised platform on one end.",
+            "exits": {
+                "east": "great-hall",
+                "west": "bedroom",
+                "south": "?"
+            },
+            "contents": ["curtain", "skeleton", "throne", "grand-rug"]
+        },
+        "bedroom": {
+            "id": "bedroom",
+            "name": "Bedroom",
+            "description": "A lavish royal bedchamber. The curtained bed sits in the middle of the room.",
+            "exits": {
+                "east": "throne-room"
+            },
+            "contents": ["bed", "wardrobe"]
+        },
+        "bathroom": {
+            "id": "bathroom",
+            "name": "Bathroom",
+            "description": "An elegant bathroom with gilded appliances.",
+            "exits": {
+                "north": "great-hall"
+            },
+            "contents": ["toilet", "sink", "tub"]
+        },
+        "courtyard": {
+            "id": "courtyard",
+            "name": "Courtyard",
+            "description": "A beautifully planted yard with a fountain in the middle and a hedge maze.",
+            "exits": {
+                "south": "great-hall"
+            },
+            "contents": ["fountain", "hedges"]
+        },
+        "interior": {
+            "id": "interior",
+            "name": "Wooden Shack",
+            "description": "A worn-down room with a cauldron in the center. Dried herbs hang from the ceiling. One wall is entirely bookcases.",
+            "exits": {
+                "east": "room",
+                "north": "yard",
+                "south": "forest"
+            },
+            "contents": ["dried-herbs", "cauldron", "broom", "bookshelves"]
+        },
+        "yard": {
+            "id": "yard",
+            "name": "Yard",
+            "description": "A small outdoor space enclosed by fences. There is a garden bed in one half and the embers of a bonfire.",
+            "exits": {
+                "south": "interior"
+            },
+            "contents": ["bonfire", "garden"]
+        },
+        "forest": {
+            "id": "forest",
+            "name": "Forest",
+            "description": "An old forest with huge trees and deep undergrowth.",
+            "exits": {
+                "north": "interior"
+            },
+            "contents": []
+        },
+        "square": {
+            "id": "square",
+            "name": "Village Sqaure",
+            "description": "A central area of a village that is very empty. There is a large statue in the center.",
+            "exits": {
+                "east": "room",
+                "west": "blacksmith",
+                "north": "food-stall"
+            },
+            "contents": []
+        },
+        "food-stall": {
+            "id": "food-stall",
+            "name": "Food Stall",
+            "description": "A wooden stall that advertises food for sale. There is no one here.",
+            "exits": {
+                "south": "square"
+            },
+            "contents": []
+        },
+        "blacksmith": {
+            "id": "blacksmith",
+            "name": "Blacksmith",
+            "description": "A clearly well used smithy. Tools have been left around, there appear to still be some coals alive in the furnace.",
+            "exits": {
+                "east": "square"
+            },
+            "items": []
+        }
+    },
+    "items": {
+        "knob": {
+            "id": "knob",
+            "name": "Knob",
+            "description": "A small triangular knob on the wall next to the only door.",
+            "location": "room",
+            "takeable": false,
+            "sides": ["castle", "wooden-shack", "village-square"],
+            "selectedSide": "castle",
+            "action": {
+                "turn": "You turn the knob"
+            },
+            "container": false
+        },
+        "chair": {
+            "id": "wooden-chair",
+            "name": "Chair",
+            "description": "A wooden chair like the many others around the table. There is a cushion on the seat.",
+            "location": "great-hall",
+            "takeable": false,
+            "action": {
+                "use": "As you sit, you see a jewel peeking out from under the cushion."
+            },
+            "container": true,
+            "contents": ["blue-jewel"]
+        },
+        "table": {
+            "id": "great-table",
+            "name": "Huge Table",
+            "description": "A huge table with the remnants of a feast, with carrots, bread, and a jug",
+            "location": "great-hall",
+            "takeable": false,
+            "container": true,
+            "contents": ["carrot", "bread", "jug"]
+        },
+        "blue-jewel": {
+            "id": "blue-jewel",
+            "name": "Blue Jewel",
+            "description": "A small beautiful round blue jewel",
+            "location": "chair",
+            "takeable": true,
+            "container": false
+        },
+        "green-jewel": {
+            "id": "green-jewel",
+            "name": "Green Jewel",
+            "description": "A small beautiful square green jewel",
+            "location": "rug",
+            "takeable": true,
+            "container": false
+        },
+        "yellow-jewel": {
+            "id": "yellow-jewel",
+            "name": "Yellow Jewel",
+            "description": "A small beautiful round yellow jewel",
+            "location": "tub",
+            "takeable": true,
+            "container": false
+        },
+        "red-jewel": {
+            "id": "red-jewel",
+            "name": "Red Jewel",
+            "description": "A large red rectangular jewel",
+            "location": "hedge",
+            "takeable": true,
+            "container": false
+        },
+        "purple-jewel": {
+            "id": "purple-jewel",
+            "name": "Purple Jewel",
+            "description": "A small beautiful square purple jewel",
+            "location": "crown",
+            "takeable": true,
+            "container": false
+        },
+
     }
 }
