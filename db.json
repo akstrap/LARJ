@@ -209,7 +209,6 @@
             "location": "crown",
             "takeable": true,
             "container": false
-        },
-
+        }
     }
 }
