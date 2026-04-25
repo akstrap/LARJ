@@ -47,7 +47,7 @@
                 "west": "bedroom",
                 "south": "?"
             },
-            "contents": ["curtain", "skeleton", "throne", "grand-rug"]
+            "contents": ["curtain", "crown", "throne", "grand-rug"]
         },
         "bedroom": {
             "id": "bedroom",
@@ -85,7 +85,7 @@
                 "north": "yard",
                 "south": "forest"
             },
-            "contents": ["dried-herbs", "cauldron", "broom", "bookshelves"]
+            "contents": ["dried-herbs", "cauldron", "bookshelves"]
         },
         "yard": {
             "id": "yard",
@@ -103,18 +103,18 @@
             "exits": {
                 "north": "interior"
             },
-            "contents": []
+            "contents": ["undergrowth"]
         },
         "square": {
             "id": "square",
-            "name": "Village Sqaure",
-            "description": "A central area of a village that is very empty. There is a large statue in the center.",
+            "name": "Village Square",
+            "description": "A central area of a village that is very empty. There is a large statue in the center with a mule hitched to it.",
             "exits": {
                 "east": "room",
                 "west": "blacksmith",
                 "north": "food-stall"
             },
-            "contents": []
+            "contents": ["statue", "mule"]
         },
         "food-stall": {
             "id": "food-stall",
@@ -123,7 +123,7 @@
             "exits": {
                 "south": "square"
             },
-            "contents": []
+            "contents": ["crows"]
         },
         "blacksmith": {
             "id": "blacksmith",
@@ -132,33 +132,95 @@
             "exits": {
                 "east": "square"
             },
-            "items": []
+            "items": ["furnace", "workbench"]
         }
     },
-    "items": {
+    "interactables": {
+        "curtain": {
+            "id": "curtain",
+            "name": "Curtain",
+            "description": "A heavy red velvet curtain hanging on the wall.",
+            "location": "throne-room",
+            "action": {
+                "pull": "You pull the curtain aside and reveal a door with a ring shaped indentation in the center."
+            }
+        },
         "knob": {
             "id": "knob",
             "name": "Knob",
             "description": "A small triangular knob on the wall next to the only door.",
             "location": "room",
-            "takeable": false,
             "sides": ["castle", "wooden-shack", "village-square"],
             "selectedSide": "castle",
             "action": {
                 "turn": "You turn the knob"
+            }
+        },
+         "fountain": {
+            "id": "fountain",
+            "name": "Fountain",
+            "description": "A large fountain with a statue of a mermaid in the center. The water is not running.",
+            "location": "courtyard",
+            "action": {
+                "turn on": "You turn on the fountain and the water begins to flow."
+            }
+        },
+        "bed": {
+            "id": "bed",
+            "name": "Bed",
+            "description": "A large ornate bed with a canopy. The curtains are drawn around it.",
+            "location": "bedroom",
+            "action": {
+                "nap": "You settle into the bed for a rest."
+            }
+        },
+        "toilet": {
+            "id": "toilet",
+            "name": "Toilet",
+            "description": "An elegant gilded toilet. It is empty and dry.",
+            "location": "bathroom",
+            "action": {
+                "flush": "You flush the toilet and the water swirls around."
+            }
+         },
+         "sink": {
+            "id": "sink",
+            "name": "Sink",
+            "description": "An elegant gilded sink. It is empty and dry.",
+            "location": "bathroom",
+            "action": {
+                "turn on": "You turn on the sink and the water begins to flow."
+            }
+         },
+         "furnace": {
+            "id": "furnace",
+            "name": "Furnace",
+            "description": "A large stone furnace with glowing embers inside.",
+            "location": "blacksmith",
+            "action": {
+                "light": "You light the furnace and the flames roar to life."
+            }
+         }
+    },
+    "containers": {
+        "wardrobe": {
+            "id": "wardrobe",
+            "name": "Wardrobe",
+            "description": "A large ornate wardrobe with two doors. It looks like it could fit a person inside.",
+            "location": "bedroom",
+            "action": {
+                "open": "You open the wardrobe and see a a key ring hanging from a hook inside."
             },
-            "container": false
+            "contents": ["courtyard-key"]
         },
         "chair": {
             "id": "wooden-chair",
             "name": "Chair",
             "description": "A wooden chair like the many others around the table. There is a cushion on the seat.",
             "location": "great-hall",
-            "takeable": false,
             "action": {
                 "use": "As you sit, you see a jewel peeking out from under the cushion."
             },
-            "container": true,
             "contents": ["blue-jewel"]
         },
         "table": {
@@ -166,49 +228,360 @@
             "name": "Huge Table",
             "description": "A huge table with the remnants of a feast, with carrots, bread, and a jug",
             "location": "great-hall",
-            "takeable": false,
-            "container": true,
             "contents": ["carrot", "bread", "jug"]
         },
+        "grand-rug": {
+            "id": "grand-rug",
+            "name": "Grand Rug",
+            "description": "A large ornate rug with a beautiful pattern. It looks like it could be hiding something underneath.",
+            "location": "throne-room",
+            "action": {
+                "search": "You search under the rug and find a jewel."
+            },
+            "contents": ["green-jewel"]
+        },
+       "throne": {
+            "id": "throne",
+            "name": "Throne",
+            "description": "A majestic throne with intricate carvings. It has a jeweled drawer under the seat.",
+            "location": "throne-room",
+            "action": {
+                "open drawer": "You search under the throne and find a jewel."
+            },
+            "contents": ["purple-jewel"]
+        },
+        "tub": {
+            "id": "tub",
+            "name": "Tub",
+            "description": "An elegant gilded tub. It is empty and dry.",
+            "location": "bathroom",
+            "action": {
+                "turn on": "It takes a moment for the water to start flowing, but eventually it spurts out, with a jewel in the stream."
+            },
+            "contents": ["yellow-jewel"]
+         },
+         "hedge": {
+            "id": "hedge",
+            "name": "Hedge",
+            "description": "A tall hedge in the middle of the maze. It looks like it could be hiding something.",
+            "location": "courtyard",
+            "action": {
+                "search": "You search around the hedge and find a jewel."
+            },
+            "contents": ["red-jewel"]
+         },
+         "dried-herbs": {
+            "id": "dried-herbs",
+            "name": "Dried Herbs",
+            "description": "A bundle of dried herbs hanging from the ceiling.",
+            "location": "interior",
+            "contents": ["mandrake-root", "blackthorn", "belladonna"]
+         },
+        "bookshelves": {
+            "id": "bookshelves",
+            "name": "Bookshelves",
+            "description": "A wall of bookshelves filled with dusty old tomes.",
+            "location": "interior",                
+            "contents": ["ring-production-book", "how-to-fly-book", "mind-control-book"]
+        },
+        "bonfire": {
+            "id": "bonfire",
+            "name": "Bonfire",
+            "description": "The embers of a bonfire, it has a straw doll lying in the ashes.",
+            "location": "yard",
+            "action": {
+                "rekindle": "You rekindle the bonfire."
+            },
+            "contents": ["ashes", "straw-doll"]
+        },
+        "garden": {
+            "id": "garden",
+            "name": "Garden",
+            "description": "A small garden bed with a few flowers and vegetables growing in it.",
+            "location": "yard",
+            "contents": ["sunflower", "barley"]
+        },
+        "undergrowth": {
+            "id": "undergrowth",
+            "name": "Undergrowth",
+            "description": "A rotted log with mushrooms growing on it lies in the undergrowth. A group of toads peers up at you from beside it.",
+            "location": "forest",
+            "contents": ["toad", "mushroom"]
+        },
+        "workbench": {
+            "id": "workbench",
+            "name": "Workbench",
+            "description": "A well-used workbench with various old tools and creations scattered on top.",
+            "location": "blacksmith",
+            "contents": ["old-sword", "horseshoes"]
+        }
+    },
+    "items": {
         "blue-jewel": {
             "id": "blue-jewel",
             "name": "Blue Jewel",
             "description": "A small beautiful round blue jewel",
             "location": "chair",
-            "takeable": true,
-            "container": false
+            "usable": true
         },
         "green-jewel": {
             "id": "green-jewel",
             "name": "Green Jewel",
             "description": "A small beautiful square green jewel",
-            "location": "rug",
-            "takeable": true,
-            "container": false
+            "location": "grand-rug",
+            "usable": true
         },
         "yellow-jewel": {
             "id": "yellow-jewel",
             "name": "Yellow Jewel",
             "description": "A small beautiful round yellow jewel",
             "location": "tub",
-            "takeable": true,
-            "container": false
+            "usable": true
         },
         "red-jewel": {
             "id": "red-jewel",
             "name": "Red Jewel",
             "description": "A large red rectangular jewel",
             "location": "hedge",
-            "takeable": true,
-            "container": false
+            "usable": true
         },
         "purple-jewel": {
             "id": "purple-jewel",
             "name": "Purple Jewel",
             "description": "A small beautiful square purple jewel",
-            "location": "crown",
-            "takeable": true,
-            "container": false
+            "location": "throne",
+            "usable": true
+        },
+        "courtyard-key": {
+            "id": "courtyard-key",
+            "name": "Key",
+            "description": "A small brass key with a flower engraved on it.",
+            "location": "wardrobe",
+            "usable": true
+        },
+        "carrot": {
+            "id": "carrot",
+            "name": "Carrot",
+            "description": "An old carrot, but it still looks edible.",
+            "location": "table",
+            "usable": true
+        },
+        "bread": {
+            "id": "bread",
+            "name": "Bread",
+            "description": "A stale piece of bread.",
+            "location": "table",
+            "usable": true
+         },
+         "jug": {
+            "id": "jug",
+            "name": "Jug",
+            "description": "An old ceramic jug. It contains some kind of orange juice..",
+            "location": "table",
+            "usable": true
+        },
+        "mandrake-root": {
+            "id": "mandrake-root",
+            "name": "Mandrake Root",
+            "description": "A gnarled root that looks like a person.",
+            "location": "dried-herbs",
+            "usable": true
+        },
+        "blackthorn": {
+            "id": "blackthorn",
+            "name": "Blackthorn",
+            "description": "A sharp dried branch with thorns.",
+            "location": "dried-herbs",
+            "usable": true
+        },
+        "belladonna": {
+            "id": "belladonna",
+            "name": "Belladonna",
+            "description": "A small bunch of belladonna flowers.",
+            "location": "dried-herbs",
+            "usable": true
+         },
+         "ring-production-book": {
+            "id": "ring-production-book",
+            "name": "Ring Production Book",
+            "description": "The first page of the book reads 'To produce a ring portion, combine blackthorn, mushroom, orange juice, and ashes in a cauldron, then stir.'",
+            "location": "bookshelves",
+            "usable": false
+         },
+         "how-to-fly-book": {
+            "id": "how-to-fly-book",
+            "name": "How To Fly Book",
+            "description": "The first page of the book reads 'To create a flying potion, combine belladonna, sunflower, a toad, and some fresh water in a cauldron, then stir.'",
+            "location": "bookshelves",
+            "usable": false
+         },
+         "mind-control-book": {
+            "id": "mind-control-book",
+            "name": "Mind Control Book",
+            "description": "The first page of the book reads 'To control someone's mind, put a feather, a straw doll, mandrake root, and something of theirs in a cauldron, then stir.'",
+            "location": "bookshelves",
+            "usable": false
+        },
+        "ashes": {
+            "id": "ashes",
+            "name": "Ashes",
+            "description": "The ashes of a bonfire.",
+            "location": "bonfire",
+            "usable": true
+        },
+        "straw-doll": {
+            "id": "straw-doll",
+            "name": "Straw Doll",
+            "description": "A small doll made of straw.",
+            "location": "bonfire",
+            "usable": true
+         },
+         "sunflower": {
+            "id": "sunflower",
+            "name": "Sunflower",
+            "description": "A bright yellow sunflower.",
+            "location": "garden",
+            "usable": true
+        },
+        "barley": {
+            "id": "barley",
+            "name": "Barley",
+            "description": "A stalk of barley with a grain head.",
+            "location": "garden",
+            "usable": true
+        },
+        "toad": {
+            "id": "toad",
+            "name": "Toad",
+            "description": "A small brown toad with bumpy skin.",
+            "location": "undergrowth",
+            "usable": true
+        },
+        "mushroom": {
+            "id": "mushroom",
+            "name": "Mushroom",
+            "description": "A small white mushroom with a round cap.",
+            "location": "undergrowth",
+             "usable": true
+         },
+         "note": {
+            "id": "note",
+            "name": "Note",
+            "description": "A small note titled 'How to care for your mule'. It reads 'To care for your mule, feed it carrots and barley and give it horseshoes to wear. Then, release it to be free'",
+            "location": "crows",
+             "usable": false
+         },
+         "feather": {
+            "id": "feather",
+            "name": "Feather",
+            "description": "A black crow feather.",
+            "location": "crows",
+             "usable": true
+         },
+         "old-sword": {
+            "id": "old-sword",
+            "name": "Old Sword",
+            "description": "A rusty old sword. It doesn't look like it would be very effective in combat, but the edge does seem to be sharp.",
+            "location": "workbench",
+            "usable": true
+         },
+         "horseshoes": {
+            "id": "horseshoes",
+            "name": "Horseshoes",
+            "description": "A set of old horseshoes. Amazingly, they seem to be in perfect condition.",
+            "location": "workbench",
+            "usable": true
+        }
+    },
+    "gatherers": {
+        "crown": {
+            "id": "crown",
+            "name": "Crown",
+            "description": "A golden crown with several obviously missing jewels.",
+            "location": "throne-room",
+            "action": {},
+            "interact": {
+                "blue-jewel": "You place the blue jewel in the crown, and it fits perfectly.",
+                "green-jewel": "The green jewel fits perfectly into one of the empty spots in the crown.",
+                "yellow-jewel": "You line the yellow jewel up with one of the empty spaces, and it fits in.",
+                "red-jewel": "The red jewel fills the large center space in the crown perfectly.",
+                "purple-jewel": "The purple jewel clicks neatly into the crown."
+            },
+            "conditions": {
+                "full": {
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "newDescription": "The crown is now complete with all jewels in place. It shines brightly.",
+                    "reveal": [],
+                    "newAction": {
+                        "place-on-skeleton's-head": {
+                            "message": "You place the crown on the skeleton's head, and it glows. The skeleton's hand uncurls, revealing what appears to be a piece of broken ring.",
+                            "reveal": ["ring-portion-castle"]
+                        }
+                    }
+                },
+                "missing-blue-jewel": {
+                    "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "newDescription": "The crown is missing one final jewel. It looks incomplete.",
+                    "reveal": []
+                },
+                "missing-green-jewel": {
+                    "contains": ["blue-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "newDescription": "The crown is missing one final jewel. It looks incomplete.",
+                    "reveal": []
+                },
+                "missing-yellow-jewel": {
+                    "contains": ["blue-jewel", "green-jewel", "red-jewel", "purple-jewel"],
+                    "newDescription": "The crown is missing one final jewel. It looks incomplete.",
+                    "reveal": []
+                },
+                "missing-red-jewel": {
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "purple-jewel"],
+                    "newDescription": "The crown is missing one final jewel. It looks incomplete.",
+                    "reveal": []
+                },
+                "missing-purple-jewel": {
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel"],
+                    "newDescription": "The crown is missing one final jewel. It looks incomplete.",
+                    "reveal": []
+                }
+            }
+        },
+        "crows": {
+            "id": "crows",
+            "name": "Crows",
+            "description": "A group of crows are surrounding something on the surface of the food stall.",
+            "location": "food-stall",
+            "action": {
+                "shoo": {
+                    "message": "You shoo the crows away, and they come right back before you can get close"
+                }
+            },
+            "interact": {
+                "bread": "You throw a piece of bread on the ground, and the crows swarm it"
+            },
+            "conditions": {
+                "full": {
+                    "contains": ["bread", "note", "feather"],
+                    "newDescription": "The crows are happily pecking at the bread. There is a note revealed on the counter, with a feather left next to it.",
+                    "reveal": ["note", "feather"]
+                }
+            },
+            "contents": ["note", "feather"]
+        },
+        "cauldron": {
+            "id": "cauldron",
+            "name": "Cauldron",
+            "description": "A large bronze cauldron. It is currently empty.",
+            "location": "interior",
+            "action": {},
+            "interact": {
+                "blackthorn": "You add the blackthorn to the cauldron.",
+                "mushroom": "You add the mushroom to the cauldron.",
+                "jug": "You pour the orange juice from the jug into the cauldron.",
+                "ashes": "You add the ashes to the cauldron.",
+                "belladonna": "You add the belladonna to the cauldron.",
+                "sunflower": "You add the sunflower to the cauldron."
+            }
         }
     }
 }
