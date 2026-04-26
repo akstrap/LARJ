@@ -1,27 +1,21 @@
-import Item from "./Item.js";
+import GameObject from "./GameObject.js";
 
-class Interactable extends Item {
-    constructor(
-        id,
-        name,
-        description,
-        location,
-        action = {},
-        conditions = [],
-        output
-    ) {
-        super(id, name, description, location);
-        this.action = action;
-        this.conditions = conditions;
-        this.output = output;
+class Interactable extends GameObject {
+    constructor(data) {
+        super(data);
+        this.action = data.action || {};
     }
 
-    use(world) {
-            if (this.checkConditions()) {
-                world.message = this.output;
-                this.action.handler(world);
-            } else {
-                world.message = "You can't do that right now.";
-            }
+    getActions(world) {
+        const actions = super.getActions(world);
+        
+        actions.push({
+            name: Object.keys(this.action)[0],
+            handler: (world) => this.use(world, Object.keys(this.action)[0])
+        })
+    }
+
+    use(world, actionName) {
+        return this.action[actionName] || "Nothing happens.";
     }
 }

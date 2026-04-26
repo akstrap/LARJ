@@ -1,24 +1,10 @@
 import GameObject from "./GameObject.js"
 
 class Container extends GameObject {
-    constructor(
-        id,
-        name,
-        description,
-        location,
-        contents = []
-    ) {
-        super(id, name, description, location);
-        this.contents = contents;
-    }
-    constructor(
-        id,
-        name,
-        description,
-        contents = []
-    ) {
-        super(id, name, description);
-        this.contents = contents;
+    constructor(data) {
+        super(data);
+        this.contents = data.contents || [];
+        this.action = data.action || {};
     }
 
     addChild(item) {
@@ -31,6 +17,10 @@ class Container extends GameObject {
 
     getChildById(id) {
         this.contents.find(obj => obj.id === id)
+    }
+
+    accessContents() {
+        return this.contents;
     }
 
 }

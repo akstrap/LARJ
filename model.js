@@ -1,4 +1,4 @@
-import Player from './player.js';
+import Player from './Player.js';
 
 export const world = {
     currentRoom: null,
@@ -7,3 +7,5 @@ export const world = {
     items: {},
     selectedInventoryItem: null
 }
+
+export default world;

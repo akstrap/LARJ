@@ -1,13 +1,9 @@
 import GameObject from "./GameObject.js"
 
 class Item extends GameObject {
-    constructor(
-        id,
-        name,
-        description,
-        location
-    ) {
-        super(id, name, description, location)
+    constructor(data) {
+        super(data)
+        this.usable = data.usable || false;
     }
 
     take(world) {
@@ -39,10 +35,12 @@ class Item extends GameObject {
                 name: "Drop",
                 handler: (world) => this.drop(world)
             })
-            actions.push({
-                name: "Use",
-                handler: (world) => this.use(world)
-            })
+            if (this.usable) {
+                actions.push({
+                    name: "Use",
+                    handler: (world) => this.use(world)
+                })
+            }
         } else if (this.location === currentRoom) {
             actions.push({
                 name: "Take",

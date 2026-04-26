@@ -1,25 +1,9 @@
 class GameObject{
-    constructor(
-        id,
-        name,
-        description,
-        location
-    ) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-    }
-
-    constructor(
-        id,
-        name,
-        description
-    ) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = "world"
+    constructor(data) {
+        this.id = data.id;
+        this.name = data.name;
+        this.description = data.description;
+        this.location = data.location;
     }
 
     getId() {

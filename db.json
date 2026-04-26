@@ -33,8 +33,10 @@
             "exits": {
                 "east": "room",
                 "west": "throne-room",
-                "north": "courtyard",
                 "south": "bathroom"
+            },
+            "lockedExits": {
+                "north": "?"
             },
             "contents": ["chair", "table"]
         },
@@ -44,8 +46,7 @@
             "description": "A grand room with a majestic throne on a raised platform on one end.",
             "exits": {
                 "east": "great-hall",
-                "west": "bedroom",
-                "south": "?"
+                "west": "bedroom"
             },
             "contents": ["curtain", "crown", "throne", "grand-rug"]
         },
@@ -132,7 +133,7 @@
             "exits": {
                 "east": "square"
             },
-            "items": ["furnace", "workbench"]
+            "contents": ["furnace", "workbench"]
         }
     },
     "interactables": {
@@ -143,6 +144,9 @@
             "location": "throne-room",
             "action": {
                 "pull": "You pull the curtain aside and reveal a door with a ring shaped indentation in the center."
+            },
+            "newLockedExit": {
+                "south": "?"
             }
         },
         "knob": {
@@ -491,6 +495,34 @@
             "description": "A set of old horseshoes. Amazingly, they seem to be in perfect condition.",
             "location": "workbench",
             "usable": true
+        },
+        "harness": {
+            "id": "harness",
+            "name": "Harness",
+            "description": "The end of the rope that the mule was hitched to the statue by.",
+            "location": "statue",
+            "usable": true
+        },
+        "ring-portion-castle": {
+            "id": "ring-portion-castle",
+            "name": "Broken piece of ring",
+            "description": "A broken piece of ring made out of gold.",
+            "location": "crown",
+            "usable": true
+        },
+        "ring-portion-shack": {
+            "id": "ring-portion-shack", 
+            "name": "Broken piece of ring",
+            "description": "A broken piece of ring made out of silver",
+            "location": "cauldron",
+            "usable": true
+        },
+        "ring-portion-village": {
+            "id": "ring-portion-village",
+            "name": "Broken piece of ring",
+            "description": "A broken piece of ring made out of bronze",
+            "location": "mule",
+            "usable": true
         }
     },
     "gatherers": {
@@ -509,7 +541,7 @@
             },
             "conditions": {
                 "full": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is now complete with all jewels in place. It shines brightly.",
                     "reveal": [],
                     "newAction": {
@@ -520,31 +552,32 @@
                     }
                 },
                 "missing-blue-jewel": {
-                    "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-green-jewel": {
-                    "contains": ["blue-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
+                    "contains": ["blue-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-yellow-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "red-jewel", "purple-jewel"],
+                    "contains": ["blue-jewel", "green-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-red-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "purple-jewel"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "purple-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-purple-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "ring-portion-castle"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 }
-            }
+            },
+            "hiddenContents": ["ring-portion-castle"]
         },
         "crows": {
             "id": "crows",
@@ -552,9 +585,7 @@
             "description": "A group of crows are surrounding something on the surface of the food stall.",
             "location": "food-stall",
             "action": {
-                "shoo": {
-                    "message": "You shoo the crows away, and they come right back before you can get close"
-                }
+                "shoo": "You shoo the crows away, and they come right back before you can get close"
             },
             "interact": {
                 "bread": "You throw a piece of bread on the ground, and the crows swarm it"
@@ -566,12 +597,12 @@
                     "reveal": ["note", "feather"]
                 }
             },
-            "contents": ["note", "feather"]
+            "hiddenContents": ["note", "feather"]
         },
         "cauldron": {
             "id": "cauldron",
             "name": "Cauldron",
-            "description": "A large bronze cauldron. It is currently empty.",
+            "description": "A large bronze cauldron.",
             "location": "interior",
             "action": {},
             "interact": {
@@ -580,8 +611,111 @@
                 "jug": "You pour the orange juice from the jug into the cauldron.",
                 "ashes": "You add the ashes to the cauldron.",
                 "belladonna": "You add the belladonna to the cauldron.",
-                "sunflower": "You add the sunflower to the cauldron."
-            }
+                "sunflower": "You add the sunflower to the cauldron.",
+                "toad": "You add the toad to the cauldron.",
+                "feather": "You add the feather to the cauldron.",
+                "mandrake-root": "You add the mandrake root to the cauldron,",
+                "straw-doll": "You add the straw doll to the cauldron."
+            },
+            "conditions": {
+                "full": {
+                    "contains": ["blackthorn", "mushroom", "jug", "ashes", "ring-portion-shack"],
+                    "newDescription": "The cauldron is now full. You give the contents a stir, and they bubble and a piece of broken ring floats to the top.",
+                    "reveal": ["ring-portion-shack"]
+                },
+                "fly-potion": {
+                    "contains": ["belladonna", "sunflower", "toad", "ring-portion-shack"],
+                    "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add water.",
+                    "reveal": []
+                },
+                "mind-potion": {
+                    "contains": ["feather", "straw-doll", "mandrake-root", "ring-portion-shack"],
+                    "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add something belonging to another person you're trying to control.",
+                    "reveal": []
+                }
+            },
+            "hiddenContents": ["ring-portion-shack"]
+        },
+        "mule": {
+            "id": "mule",
+            "name": "Mule",
+            "description": "A mule is hitched to the statue in the center of the square. It looks hungry.",
+            "location": "square",
+            "action": {},
+             "interact": {
+                "carrot": "You feed the mule a carrot, and it happily munches on it.",
+                "barley": "You feed the mule some barley, and it happily munches on it.",
+                "horseshoes": "You give the horseshoes to the mule, and it seems to appreciate them.",
+                "harness": "You give the other end of the rope to the mule, so it is now free"
+             },
+             "conditions": {
+                "fed": {
+                    "contains": ["carrot", "barley", "horseshoes", "harness", "ring-portion-village"],
+                    "newDescription": "The mule is happily munching on the carrot and barley, and seems to really like the horseshoes. You decide to release it to be free.",
+                    "reveal": ["ring-portion-village"]
+                }
+             },
+             "hiddenContents": ["ring-portion-village"]
+        },
+        "statue": {
+            "id": "statue",
+            "name": "Statue",
+            "description": "A large statue of a heroic figure. The empty hand is held out as if it is holding a sword.",
+            "location": "square",
+            "action": {},
+            "interact": {
+                "old-sword": "You place the old sword in the statue's hand, and it fits perfectly."
+            },
+            "conditions": {
+                "sword": {
+                    "contains": ["old-sword", "harness"],
+                    "newDescription": "The statue now brandishes a sword, and the horse's harness has been released from it.",
+                    "reveal": ["harness"]
+                }
+            },
+            "hiddenContents": ["harness"]
+        }
+    },
+    "doors": {
+        "secret-door": {
+            "id": "secret-door",
+            "name": "Secret Door",
+            "description": "A hidden door revealed from behind the curtain. It is locked, but has a ring-shaped indentation in the center.",
+            "location": "throne-room",
+            "interact": {
+                "ring-portion-castle": "You place the piece of ring from the castle in the indentation, and it fits perfectly. The door unlocks and opens to reveal a hidden room.",
+                "ring-portion-shack": "You place the piece of ring from the shack in the indentation, but it doesn't fit.",
+                "ring-portion-village": "You place the piece of ring from the village in the indentation, but it doesn't fit."
+             },
+             "conditions": {
+                "unlocked": {
+                    "contains": ["ring-portion-castle", "ring-portion-shack", "ring-portion-village"],
+                    "newDescription": "The secret door is now unlocked and open, revealing a hidden room.",
+                    "reveal": [],
+                    "unlockExit": {
+                        "south": "The End"
+                    }
+                }
+             }
+        },
+        "locked-door": {
+            "id": "locked-door",
+            "name": "Locked Door",
+            "description": "A locked door that leads north from the great hall. It has a keyhole in the center.",
+            "location": "great-hall",
+            "interact": {
+                "courtyard-key": "You insert the key into the keyhole and turn it. You hear a satisfying click as the door unlocks."
+            },
+            "conditions": {
+                "unlocked": {
+                    "contains": ["courtyard-key"],
+                    "newDescription": "The locked door is now unlocked, revealing an exit to the north.",
+                    "reveal": [],
+                    "unlockExit": {
+                        "north": "courtyard"
+                    }
+                }
+             }
         }
     }
 }

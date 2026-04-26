@@ -1,15 +1,10 @@
 import Container from "./Container.js"
 
 class Room extends Container {
-    constructor(
-        id,
-        name,
-        description,
-        contents = [],
-        exits = {}
-    ) {
-        super(id, name, description, contents);
-        this.exits = exits;
+    constructor(data) {
+        super(data);
+        this.exits = data.exits || {};
+        this.lockedExits = data.lockedExits || {};
     }
 
     getExit(dir) {
@@ -20,6 +15,10 @@ class Room extends Container {
         return Object.keys(this.exits);
     }
 
+    unlockExit(dir, newExit) {
+        this.exits[dir] = newExit;
+        delete this.lockedExits[dir];
+    }
 
 }
 
