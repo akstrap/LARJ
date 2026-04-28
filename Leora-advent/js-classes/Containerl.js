@@ -1,5 +1,5 @@
 
-import GameObject from "./GameObject.js";
+import GameObject from "./GameObjectl.js";
 
 class Container extends GameObject{
     constructor(

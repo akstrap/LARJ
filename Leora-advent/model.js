@@ -1,4 +1,4 @@
-import Player from "./js-classes/Player.js";
+import Player from "./js-classes/Playerl.js";
 
 export const world = {
     currentRoomId: null,

@@ -1,7 +1,7 @@
 import { world } from "./model.js";
-import Room from "./js-classes/Room.js";
-import Item from "./js-classes/Item.js";
-import Player from "./js-classes/Player.js";
+import Room from "./js-classes/Rooml.js";
+import Item from "./js-classes/Iteml.js";
+import Player from "./js-classes/Playerl.js";
 import { initView, render, createItemAction } from "./view.js";
 
 let els;

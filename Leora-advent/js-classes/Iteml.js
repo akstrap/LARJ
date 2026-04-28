@@ -1,4 +1,4 @@
-import GameObject from "./GameObject.js";
+import GameObject from "./GameObjectl.js";
 
 class Item extends GameObject{
     constructor(
