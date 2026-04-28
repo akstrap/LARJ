@@ -13,6 +13,10 @@ class Gatherer extends Container {
         if (this.interact[itemId]) {
             this.contents.push(itemId);
             world.player.removeChild(itemId);
+            world.message = this.interact[itemId];
+        }
+        else {
+            world.message = "I don't think those two items go together.";
         }
     }
 

@@ -16,6 +16,6 @@ class Interactable extends GameObject {
     }
 
     use(world, actionName) {
-        return this.action[actionName] || "Nothing happens.";
+        world.message = this.action[actionName] || "Nothing happens.";
     }
 }

@@ -5,7 +5,8 @@ export const world = {
     rooms: {},
     player: new Player(),
     items: {},
-    selectedInventoryItem: null
+    selectedInventoryItem: null,
+    message: "You wake up..."
 }
 
 export default world;
