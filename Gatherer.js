@@ -5,15 +5,20 @@ class Gatherer extends Container {
         super(data);
         this.action = data.action || {};
         this.conditions = data.conditions || {};
-        this.interact = data.interact || {};
+        this.interactions = data.interact || {};
         this.hiddenContents = data.hiddenContents || [];
     }
 
     interact(itemId, world) {
-        if (this.interact[itemId]) {
-            this.contents.push(itemId);
-            world.player.removeChild(itemId);
-            world.message = this.interact[itemId];
+        if (this.interactions[itemId]) {
+            const item = world.objects[itemId]
+            this.contents.push(item);
+            world.player.removeChild(item);
+            world.message = this.interactions[itemId];
+            const condition = this.checkConditions();
+            if (condition) {
+                this.applyCondition(condition, world);
+            }
         }
         else {
             world.message = "I don't think those two items go together.";
@@ -23,7 +28,7 @@ class Gatherer extends Container {
     checkConditions() {
     for (const key in this.conditions) {
       const condition = this.conditions[key];
-      if (condition.contains.every(id => this.currentItems.includes(id))) {
+      if (condition.contains.every(id => this.contents.includes(id))) {
         return condition;
       }
     }
@@ -31,15 +36,41 @@ class Gatherer extends Container {
     }
 
     getActions(world) {
-        const actions = super(world);
-
-        actions.push({
-            name: Object.keys(this.action)[0],
-            handler: (world) => this.action(itemId, world)
+        const actions = super.getActions(world);
+        const actionName = Object.keys(this.action)[0];
+        if (actionName) {
+            actions.push({
+                name: actionName,
+                handler: () => world.message = this.action[actionName]
         })
+        }
+
+        return actions;
     }
 
+    canAdd() {
+        return true;
+    }
 
+    applyCondition(condition, world) {
+        if (condition.newDescription) {
+            this.setDescription(condition.newDescription);
+        }
+        if (condition.reveal) {
+            condition.reveal.forEach(id => {
+                const obj = world.objects[id];
+                this.addChild(obj);
+                this.hiddenContents = this.hiddenContents.filter(hiddenId => hiddenId !== id);
+            })
+        }
+        if (condition.newAction) {
+            this.action = condition.newAction;
+        }
+        if (condition.unlockExit) {
+            const room = world.rooms[world.currentRoomId];
+            room.unlockExit(condition.unlockExit);
+        }
+    }
 
 }
 

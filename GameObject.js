@@ -35,6 +35,18 @@ class GameObject{
 
         return actions;
     }
+
+    canContain() {
+        return false;
+    }
+
+    canTake(){
+        return false;
+    }
+
+    canAdd() {
+        return false;
+    }
 }
 
 export default GameObject;

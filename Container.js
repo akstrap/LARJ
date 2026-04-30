@@ -16,11 +16,35 @@ class Container extends GameObject {
     }
 
     getChildById(id) {
-        this.contents.find(obj => obj.id === id)
+        return this.contents.find(obj => obj.id === id);
     }
 
-    accessContents() {
+    getContents() {
         return this.contents;
+    }
+
+    canContain() {
+        return true;
+    }
+
+    getActions(world) {
+        const actions = super.getActions(world)
+
+        if (this.action) {
+            actions.push({
+                name: Object.keys(this.action)[0],
+                handler: (world) => handleAction(world)
+        })
+        } else {
+            this.contents.forEach(item => {
+                actions.push(item.getActions())
+            })
+        }
+    }
+
+    handleAction(world) {
+        world.message = this.action[0];
+        this.action.filter(this.action[0])
     }
 
 }

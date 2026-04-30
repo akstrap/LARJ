@@ -250,7 +250,7 @@
             "description": "A majestic throne with intricate carvings. It has a jeweled drawer under the seat.",
             "location": "throne-room",
             "action": {
-                "open drawer": "You search under the throne and find a jewel."
+                "open drawer": "You open the drawer under the throne and find a jewel."
             },
             "contents": ["purple-jewel"]
         },
@@ -541,7 +541,7 @@
             },
             "conditions": {
                 "full": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
                     "newDescription": "The crown is now complete with all jewels in place. It shines brightly.",
                     "reveal": [],
                     "newAction": {
@@ -552,27 +552,27 @@
                     }
                 },
                 "missing-blue-jewel": {
-                    "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
+                    "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-green-jewel": {
-                    "contains": ["blue-jewel", "yellow-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
+                    "contains": ["blue-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-yellow-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "red-jewel", "purple-jewel", "ring-portion-castle"],
+                    "contains": ["blue-jewel", "green-jewel", "red-jewel", "purple-jewel"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-red-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "purple-jewel", "ring-portion-castle"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "purple-jewel"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 },
                 "missing-purple-jewel": {
-                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "ring-portion-castle"],
+                    "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel"],
                     "newDescription": "The crown is missing one final jewel. It looks incomplete.",
                     "reveal": []
                 }
@@ -592,7 +592,7 @@
             },
             "conditions": {
                 "full": {
-                    "contains": ["bread", "note", "feather"],
+                    "contains": ["bread"],
                     "newDescription": "The crows are happily pecking at the bread. There is a note revealed on the counter, with a feather left next to it.",
                     "reveal": ["note", "feather"]
                 }
@@ -619,17 +619,17 @@
             },
             "conditions": {
                 "full": {
-                    "contains": ["blackthorn", "mushroom", "jug", "ashes", "ring-portion-shack"],
+                    "contains": ["blackthorn", "mushroom", "jug", "ashes"],
                     "newDescription": "The cauldron is now full. You give the contents a stir, and they bubble and a piece of broken ring floats to the top.",
                     "reveal": ["ring-portion-shack"]
                 },
                 "fly-potion": {
-                    "contains": ["belladonna", "sunflower", "toad", "ring-portion-shack"],
+                    "contains": ["belladonna", "sunflower", "toad"],
                     "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add water.",
                     "reveal": []
                 },
                 "mind-potion": {
-                    "contains": ["feather", "straw-doll", "mandrake-root", "ring-portion-shack"],
+                    "contains": ["feather", "straw-doll", "mandrake-root"],
                     "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add something belonging to another person you're trying to control.",
                     "reveal": []
                 }
@@ -650,7 +650,7 @@
              },
              "conditions": {
                 "fed": {
-                    "contains": ["carrot", "barley", "horseshoes", "harness", "ring-portion-village"],
+                    "contains": ["carrot", "barley", "horseshoes", "harness"],
                     "newDescription": "The mule is happily munching on the carrot and barley, and seems to really like the horseshoes. You decide to release it to be free.",
                     "reveal": ["ring-portion-village"]
                 }
@@ -668,7 +668,7 @@
             },
             "conditions": {
                 "sword": {
-                    "contains": ["old-sword", "harness"],
+                    "contains": ["old-sword"],
                     "newDescription": "The statue now brandishes a sword, and the horse's harness has been released from it.",
                     "reveal": ["harness"]
                 }

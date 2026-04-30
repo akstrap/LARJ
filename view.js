@@ -5,22 +5,50 @@ import {world} from './model.js';
  let messageEl
  let actionBarEl
  let inventoryEl
- let itemsEl
  let exitsMapEl
  let hintCardEl
  let hintTextEl
+ let modalOverlay
+ let hintModal
+ let exitsModal
+ let hintReveal
+ let hintIndex
+ let hintPrev
+ let hintNext
+ let openHints
+ let openExits
+ let toggleItems
+
+ const state = {
+  itemsCollapsed: true,
+  selectedExitId: null,
+  currentHint: 0,
+  hintCreditsRemaining: 3,
+  resolvedHints: [],
+  openModal: null
+};
  
 
  export function initView() {
-    roomNameEl = document.querySelector(".room-name");
-    roomDescEl = document.querySelector(".room-description");
-    messageEl = document.querySelector(".message");
-    actionBarEl = document.querySelector(".action-bar");
-    inventoryEl = document.querySelector(".inventory");
-    itemsEl = document.querySelector(".items");
-    exitsMapEl = document.querySelector(".exits-map");
-    hintCardEl = document.querySelector(".hint-card");
-    hintTextEl = document.querySelector(".hint-text");
+    roomNameEl = document.querySelector("#room-name");
+    roomDescEl = document.querySelector("#room-description");
+    messageEl = document.querySelector("#message-text");
+    actionBarEl = document.querySelector("#action-bar");
+    inventoryEl = document.querySelector("#inventory-list");
+    exitsMapEl = document.querySelector("#exits-map");
+    hintCardEl = document.querySelector("#hint-card");
+    hintTextEl = document.querySelector("#hint-text");
+    toggleItems = document.querySelector("#toggle-items");
+    itemsToggleIcon = document.querySelector("#items-toggle-icon");
+    modalOverlay = document.querySelector("#modal-overlay");
+    hintModal = document.querySelector("#hint-modal");
+    exitsModal = document.querySelector("#exits-modal");
+    hintReveal = document.querySelector("#hint-reveal");
+    hintIndex = document.querySelector("#hint-index");
+    hintPrev = document.querySelector("#hint-prev");
+    hintNext = document.querySelector("#hint-next");
+    openHints = document.querySelector("#open-hints");
+    openExits = document.querySelector("#open-exits");
 
     return {
         roomNameEl,
@@ -28,215 +56,184 @@ import {world} from './model.js';
         messageEl,
         actionBarEl,
         inventoryEl,
-        itemsEl,
         exitsMapEl,
         hintCardEl,
-        hintTextEl
+        hintTextEl,
+        modalOverlay,
+        hintModal,
+        exitsModal,
+        hintReveal,
+        hintIndex,
+        hintPrev,
+        hintNext,
+        openHints,
+        openExits,
+        toggleItems
     }
 
  }
 
  export function render() {
 
-    const room = world.rooms[world.currentRoom];
-    roomNameEl.textContent = room.name;
-    renderDescription(room);
-    renderMessage(room);
-    renderActionBar(room);
-    renderInventory(world.player.inventory);
-    renderItemsPanel(room);
-    renderExitsMap(room);
+    const room = world.currentRoom;
+    renderRoom(room);
+    renderInventory();
+    renderActions();
+    renderMessage();
+    renderExits(room);
+ }
 
-    if (this.state.openModal === "hint") {
-      this.renderHints();
-    }
-  }
+ function bindEvents() {
+    toggleItems.addEventListener("click", () => {
+      state.itemsCollapsed = !state.itemsCollapsed;
+      renderItemsPanel();
+    });
 
-  renderDescription(room) {
-    roomDescEl.innerHTML = "";
+    openHints.addEventListener("click", () => state.openModal("hint"));
+    openExits.addEventListener("click", () => state.openModal("exits"));
 
-    room.contents.forEach((part) => {
-      if (part.type === "text") {
-        roomDescEl.append(document.createTextNode(part.value));
+    hintPrev.addEventListener("click", () => {
+      state.currentHint = Math.max(0, state.currentHint - 1);
+      renderHints();
+    });
+
+    hintNext.addEventListener("click", () => {
+      state.currentHint = Math.min(getUnlockableHintIndex(), state.currentHint + 1);
+      renderHints();
+    });
+
+    hintReveal.addEventListener("click", () => {
+      if (isHintResolved() || state.hintCreditsRemaining < 1) {
         return;
       }
 
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "description-link";
-      button.textContent = part.value;
-      button.addEventListener("click", () => {
-        this.state.currentFocus = `feature:${part.featureId}`;
-        this.state.selectedExitId = null;
-        this.render();
-      });
+      state.hintCreditsRemaining -= 1;
+      state.resolvedHints[state.currentHint] = true;
+      renderHints();
+    });
 
-      this.elements.roomDescription.append(button);
+    modalOverlay.addEventListener("click", (event) => {
+      if (event.target === modalOverlay) {
+        closeModal();
+        return;
+      }
+
+      const closeButton = event.target.closest("[data-close-modal]");
+      if (closeButton) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.openModal) {
+        closeModal();
+      }
     });
   }
 
-  buildActionButton(label, handler, disabled = false) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "button action-button";
-    button.textContent = label;
-    button.disabled = disabled;
-    button.addEventListener("click", handler);
-    return button;
-  }
 
-  renderActionBar() {
-    this.elements.actionBar.innerHTML = "";
+  function renderRoom(room) {
+    roomNameEl.textContent = room.name;
+    let text = room.description;
+    const usedObjects = new Set();
+    roomDescEl.innerHTML = "";
 
-    const selectedFeature = this.getSelectedFeature();
-    const selectedItem = this.getSelectedItem();
-    const selectedExit = this.getSelectedExit();
+    room.getContents().forEach(obj => {
+        const name = obj.name.toLowerCase();
+        const lowerText = text.toLowerCase();
 
-    if (selectedFeature) {
-      selectedFeature.actions.forEach((action) => {
-        if (action.type === "take") {
-          const alreadyOwned = this.state.inventory.includes(action.itemId);
-          this.elements.actionBar.append(
-            this.buildActionButton(
-              action.label,
-              () => {
-                if (!alreadyOwned) {
-                  this.state.inventory.push(action.itemId);
-                }
-                this.state.currentFocus = `item:${action.itemId}`;
-                this.render();
-              },
-              alreadyOwned,
-            ),
-          );
-          return;
+        if (lowerText.includes(name)) {
+            const parts = text.split(name);
+            if (parts[0]) {
+                roomDescEl.append(document.createTextNode(parts[0]))
+            }
+            const btn = document.createElement("button");
+            btn.className = "description-link";
+            btn.textContent = name;
+            btn.dataset.item = obj.id;
+            roomDescEl.append(btn);
+            usedObjects.add(obj.id)
+            text = parts.slice(1).join(name);
         }
+    });
 
-        this.elements.actionBar.append(
-          this.buildActionButton(action.label, () => {
-            this.state.currentFocus = "room";
-            this.scene.room.defaultMessage = action.message;
-            this.render();
-          }),
-        );
-      });
-      return;
+    if (text) {
+        roomDescEl.append(document.createTextNode(text));
     }
 
-    if (selectedItem) {
-      this.elements.actionBar.append(
-        this.buildActionButton(`Drop ${selectedItem.name}`, () => {
-          this.state.inventory = this.state.inventory.filter((id) => id !== selectedItem.id);
-          this.scene.room.defaultMessage = selectedItem.dropMessage;
-          this.state.currentFocus = "room";
-          this.render();
-        }),
-      );
-      this.elements.actionBar.append(
-        this.buildActionButton(`Use ${selectedItem.name}`, () => {
-          this.scene.room.defaultMessage = selectedItem.useMessage;
-          this.render();
-        }),
-      );
-      return;
-    }
+    const remaining = room.getContents().filter(obj => !usedObjects.has(obj.id));
 
-    if (selectedExit) {
-      this.elements.actionBar.append(
-        this.buildActionButton(
-          "Go",
-          () => {
-            this.scene.room.defaultMessage = selectedExit.enabled
-              ? `You head ${selectedExit.shortLabel} toward the ${selectedExit.detailLabel}.`
-              : "You push against the blocked path, but nothing gives.";
-            this.state.currentFocus = "room";
-            this.state.selectedExitId = null;
-            this.closeModal();
-            this.render();
-          },
-          !selectedExit.enabled,
-        ),
-      );
+    if (remaining.length > 0) {
+        roomDescEl.append(document.createElement("br"));
+
+        const prefix = document.createTextNode("You also see: ");
+        roomDescEl.append(prefix);
+
+        remaining.forEach((obj, index) => {
+            const btn = document.createElement("button");
+            btn.className = "description-link";
+            btn.textContent = obj.name;
+            btn.dataset.item = obj.id;
+
+            roomDescEl.append(btn);
+
+            if (index < remaining.length -1) {
+                roomDescEl.append(document.createTextNode(", "))
+            }
+        })
     }
   }
 
-  renderInventory() {
-    this.elements.inventoryList.innerHTML = "";
+  function renderInventory() {
+    inventoryEl.innerHTML = "";
 
-    if (!this.state.inventory.length) {
-      const empty = document.createElement("p");
-      empty.className = "empty-state";
-      empty.textContent = "Nothing yet";
-      this.elements.inventoryList.append(empty);
-      return;
-    }
+    world.player.getContents().forEach(obj => {
+        const btn = document.createElement("button");
+        btn.className = "sidebar__item"
+        btn.type = "button"
+        btn.textContent = obj.name;
 
-    this.state.inventory.forEach((itemId) => {
-      const item = this.scene.items[itemId];
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "sidebar__item";
+        if (world.selectedItem === obj) {
+            btn.classList.add("is-active")
+        }
+        btn.dataset.item = obj.id;
 
-      if (this.state.currentFocus === `item:${itemId}` || item.highlight) {
-        button.classList.add("is-active");
-      }
-
-      button.textContent = item.name;
-      button.addEventListener("click", () => {
-        this.state.currentFocus = `item:${itemId}`;
-        this.state.selectedExitId = null;
-        this.render();
-      });
-
-      this.elements.inventoryList.append(button);
+        inventoryEl.append(btn)
     });
   }
 
-  renderItemsPanel() {
-    const isExpanded = !this.state.itemsCollapsed;
-    this.elements.toggleItems.setAttribute("aria-expanded", String(isExpanded));
-    this.elements.inventoryPanel.classList.toggle("sidebar__panel--collapsed", this.state.itemsCollapsed);
-    this.elements.itemsToggleIcon.textContent = isExpanded ? "-" : "+";
+  function renderActions() {
+    actionBarEl.innerHTML = "";
+
+    if (!world.selectedItem) return;
+
+    const actions = world.selectedItem.getActions(world);
+
+    actions.forEach(action => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "button action-button";
+        btn.textContent = action.name;
+        btn.dataset.action = index;
+
+        actionBarEl.append(btn)
+    })
+
   }
 
-  renderExitsMap() {
-    this.elements.exitsMap.innerHTML = "";
-
-    this.scene.exits.forEach((exit) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "exit-node";
-      button.dataset.slot = exit.slot;
-      button.disabled = !exit.enabled;
-
-      if (this.state.selectedExitId === exit.id) {
-        button.classList.add("is-active");
-      }
-
-      button.innerHTML = exit.detailLabel
-        ? `${exit.shortLabel}<br />${exit.detailLabel}`
-        : exit.shortLabel;
-
-      button.addEventListener("click", () => {
-        this.state.selectedExitId = exit.id;
-        this.state.currentFocus = "exit";
-        this.render();
-      });
-
-      this.elements.exitsMap.append(button);
-    });
+  function renderMessage() {
+    messageEl.textContent = world.message;
   }
 
-  renderHints() {
-    const unlockableHintIndex = this.getUnlockableHintIndex();
-    const isResolved = this.isHintResolved();
-    this.elements.hintText.textContent = isResolved ? this.scene.hints[this.state.currentHint] : "";
-    this.elements.hintCard.classList.toggle("hint-card--locked", !isResolved);
-    this.elements.hintCard.classList.toggle("hint-card--revealed", isResolved);
-    this.elements.hintText.classList.toggle("modal__copy--locked", !isResolved);
-    this.elements.hintReveal.disabled =
-      isResolved || this.state.hintCreditsRemaining < 1 || this.state.currentHint !== unlockableHintIndex;
-    this.elements.hintIndex.textContent = `1/${this.state.hintCreditsRemaining}`;
-    this.elements.hintPrev.disabled = this.state.currentHint === 0;
-    this.elements.hintNext.disabled = this.state.currentHint >= unlockableHintIndex;
+  function renderExits(room) {
+    exitsMapEl.innerHTML = "";
+    Object.entries(room.exits).forEach(([dir, targetRoom]) => {
+        const btn = document.createElement("button")
+        btn.className = "exit-node";
+        btn.dataset.exit = dir;
+        btn.textContent =  `${dir.toUpperCase()} - ${targetRoom?.name || "Unknown"}`;
+
+        exitsMapEl.append(btn);
+    })
   }
+  

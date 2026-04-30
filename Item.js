@@ -9,7 +9,7 @@ class Item extends GameObject {
     take(world) {
         this.location.removeChild(this);
         world.player.addChild(this);
-        this.setLocation(player);
+        this.setLocation(world.player);
 
         world.message = `You picked up the ${this.name}.`
     }
@@ -26,24 +26,28 @@ class Item extends GameObject {
 
     }
 
+    canTake() {
+        return true;
+    }
+
     getActions(world) {
-        const actions = super(getActions(world));
+        const actions = super.getActions(world);
         const currentRoom = world.currentRoom;
 
         if (this.location === world.player) {
             actions.push({
-                name: "Drop",
+                name: `Drop ${this.name}`,
                 handler: (world) => this.drop(world)
             })
             if (this.usable) {
                 actions.push({
-                    name: "Use",
+                    name: `Use ${this.name}`,
                     handler: (world) => this.use(world)
                 })
             }
         } else if (this.location === currentRoom) {
             actions.push({
-                name: "Take",
+                name: `Take ${this.name}`,
                 handler: (world) => this.take(world)
             })
         }

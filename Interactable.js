@@ -9,13 +9,18 @@ class Interactable extends GameObject {
     getActions(world) {
         const actions = super.getActions(world);
         
-        actions.push({
-            name: Object.keys(this.action)[0],
-            handler: (world) => this.use(world, Object.keys(this.action)[0])
-        })
+        Object.keys(this.action).forEach(actionName => {
+            actions.push({
+                name: actionName,
+                handler: (world) => this.use(world, actionName)
+            })
+        });
+        return actions;
     }
 
     use(world, actionName) {
         world.message = this.action[actionName] || "Nothing happens.";
     }
 }
+
+export default Interactable
