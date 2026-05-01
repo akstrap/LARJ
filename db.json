@@ -29,7 +29,7 @@
         "great-hall": {
             "id": "great-hall",
             "name": "Great Hall",
-            "description": "An expansive main room with a huge [table] in the middle surrounded by chairs. There is a large [chair] at the head of the table.",
+            "description": "An expansive main room with a huge [table] in the middle surrounded by chairs. There is a large [chair] at the head of the table. A [door:locked-door] leads to the north.",
             "exits": {
                 "east": "room",
                 "west": "throne-room",
@@ -71,11 +71,11 @@
         "courtyard": {
             "id": "courtyard",
             "name": "Courtyard",
-            "description": "A beautifully planted yard with a [fountain] in the middle and a [hedge maze:hedges].",
+            "description": "A beautifully planted yard with a [fountain] in the middle and a [hedge maze:hedge].",
             "exits": {
                 "south": "great-hall"
             },
-            "contents": ["fountain", "hedges"]
+            "contents": ["fountain", "hedge"]
         },
         "interior": {
             "id": "interior",
@@ -268,7 +268,7 @@
          "hedge": {
             "id": "hedge",
             "name": "Hedge",
-            "description": "A tall hedge in the middle of the maze. It looks like it could be hiding something.",
+            "description": "A tall thickly grown hedge maze.",
             "location": "courtyard",
             "action": {
                 "search": "You search around the hedge and find a jewel."
@@ -549,12 +549,9 @@
                 "full": {
                     "contains": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
                     "newDescription": "The crown is now complete with all jewels in place. It shines brightly.",
-                    "reveal": [],
+                    "reveal": ["ring-portion-castle"],
                     "newAction": {
-                        "place-on-skeleton's-head": {
-                            "message": "You place the crown on the skeleton's head, and it glows. The skeleton's hand uncurls, revealing what appears to be a piece of broken ring.",
-                            "reveal": ["ring-portion-castle"]
-                        }
+                        "Place on skeleton's head": "You place the crown on the skeleton's head, and it glows. The skeleton's hand uncurls, revealing what appears to be a piece of broken ring."
                     }
                 },
                 "missing-blue-jewel": {
@@ -626,7 +623,10 @@
             "conditions": {
                 "full": {
                     "contains": ["blackthorn", "mushroom", "jug", "ashes"],
-                    "newDescription": "The cauldron is now full. You give the contents a stir, and they bubble and a piece of broken ring floats to the top.",
+                    "newDescription": "The cauldron is now full.",
+                    "newAction": {
+                        "Stir": "You give the contents a stir, and they bubble and a piece of broken ring floats to the top."
+                    },
                     "reveal": ["ring-portion-shack"]
                 },
                 "fly-potion": {

@@ -329,9 +329,27 @@ import {world} from './model.js';
         const btn = document.createElement("button")
         btn.className = "exit-node";
         btn.dataset.exit = dir;
+        btn.dataset.slot = dir;
         btn.textContent =  `${dir.toUpperCase()} - ${targetRoom?.name || "Unknown"}`;
+
+        exitsMapEl.append(btn);
+    })
+    Object.entries(room.lockedExits).forEach(([dir, targetRoom]) => {
+        const btn = document.createElement("button")
+        btn.className = "exit-node";
+        btn.dataset.exit = dir;
+        btn.dataset.slot = dir;
+        btn.textContent = `${dir.toUpperCase()} - ${targetRoom?.name || "Unknown"}`;
+        btn.disabled = true;
 
         exitsMapEl.append(btn);
     })
   }
   
+  export function closeActiveModal() {
+    state.openModal = null;
+    modalOverlay.classList.add("hidden");
+    modalOverlay.setAttribute("aria-hidden", "true");
+    hintModal.classList.add("hidden");
+    exitsModal.classList.add("hidden");
+}

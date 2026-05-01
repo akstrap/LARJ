@@ -15,9 +15,12 @@ class Room extends Container {
         return Object.keys(this.exits);
     }
 
-    unlockExit(dir, newExit) {
-        this.exits[dir] = newExit;
-        delete this.lockedExits[dir];
+    unlockExit(exitObj, world) {
+        for (const dir in exitObj) {
+            const roomId = exitObj[dir];
+            this.exits[dir] = world.rooms[roomId];
+            delete this.lockedExits[dir]
+        }
     }
 
 }

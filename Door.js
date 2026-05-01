@@ -8,27 +8,29 @@ class Door extends GameObject {
         this.key = data.interact || {};
     }
 
-    interact(world, itemId) {
-        if (!this.key[itemId]){
+    interact(item, world) {
+        console.log("Door interact world:", world)
+        if (!this.key[item.id]){
             world.message = "I don't think that item will work here.";
             return;
         }
-        this.currentItems.push(itemId);
-        world.player.removeChild(itemId);
+        this.currentItems.push(item);
+        world.player.removeChild(item);
+        world.message = this.key[item.id]
+        world.selectedItem = null;
+        world.selectedInventoryItem = null;
         const condition = this.checkConditions();
         if (condition) {
-            world.currentRoom = condition.nextRoom;
-            world.message = condition.message;
             this.applyCondition(condition, world);
         } else {
-            world.message = this.key[itemId];
+            world.message = this.key[item.id];
         }
     }
 
     checkConditions() {
         for (const key in this.conditions) {
             const condition = this.conditions[key];
-            if (condition.contains.every(id => this.currentItems.includes(id))) {
+            if (condition.contains.every(id => this.currentItems.some(item => item.id === id))) {
                 return condition;
             }
         }
@@ -45,11 +47,11 @@ class Door extends GameObject {
         if (condition.reveal) {
             condition.reveal.forEach(id => {
                 const obj = world.objects[id];
-                world.rooms[world.currentRoom].addChild(obj);
+                this.location.addChild(obj);
             })
         }  
         if (condition.unlockExit) {
-            world.rooms[world.currentRoom].unlockExit(condition.unlockExit);
+            this.location.unlockExit(condition.unlockExit, world);
         }
     }
 }

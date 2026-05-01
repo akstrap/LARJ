@@ -1,5 +1,5 @@
 import { world } from "./model.js";
-import { initView, render } from "./view.js";
+import { initView, render, closeActiveModal } from "./view.js";
 import Player from "./Player.js";
 import Item from "./Item.js";
 import Container from "./Container.js";
@@ -7,6 +7,7 @@ import Gatherer from "./Gatherer.js";
 import Interactable from "./Interactable.js";
 import Knob from "./Knob.js";
 import Room from "./Room.js";
+import Door from "./Door.js";
 
 let els;
 
@@ -20,6 +21,7 @@ export async function init() {
     createGatherers(data);
     createContainers(data);
     createInteractables(data);
+    createDoors(data);
     createRooms(data);
 
     linkWorld();
@@ -58,6 +60,12 @@ function createInteractables(data) {
         } else {
             world.objects[data.id] = new Interactable(data);
         }
+    })
+}
+
+function createDoors(data) {
+    Object.values(data.doors).forEach(data => {
+        world.objects[data.id] = new Door(data);
     })
 }
 
@@ -133,21 +141,17 @@ function handleClick(e) {
 function handleExit(dir) {
     const room = world.currentRoom;
     let dest = room.getExit(dir);
-
-    console.log("EXIT CLICKED:", dir);
-    console.log("CURRENT ROOM:", room);
-    console.log("EXIT VALUE:", room.getExit(dir));
-
     if (dest === "unknown") {
         dest = resolveUnknownExit(room, dir);
     }
     if (!dest) return;
 
-    console.log("Dest:", dest)
     world.currentRoom = dest;
     world.selectedItem = null;
-    world.message = `You moved ${dir}`
     world.selectedInventoryItem = null;
+    world.message = `You moved ${dir} to the ${dest.name}`
+
+    closeActiveModal();
 
     render();
 }
@@ -161,7 +165,10 @@ function handleItem(itemId) {
         return;
     }
     else {
+        console.log("Controller world:", world)
         item.interact(world.selectedInventoryItem, world);
+        world.selectedInventoryItem = null;
+        world.selectedItem = null;
         render();
     }
 }

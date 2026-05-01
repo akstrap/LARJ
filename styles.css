@@ -434,7 +434,6 @@ textarea {
 
 .exit-node[data-slot="west"] {
   grid-area: west;
-  color: #867b7b;
 }
 
 .exit-node[data-slot="east"] {
@@ -443,8 +442,10 @@ textarea {
 
 .exit-node[data-slot="south"] {
   grid-area: south;
-  border-color: #c5bcbc;
-  color: #c5bcbc;
+}
+
+.exit-node[data-visited=false] {
+  color: #867b7b;
 }
 
 .exit-node.is-active {
