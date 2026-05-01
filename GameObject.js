@@ -1,3 +1,5 @@
+
+
 class GameObject{
     constructor(data) {
         this.id = data.id;
@@ -47,6 +49,11 @@ class GameObject{
     canAdd() {
         return false;
     }
+
+    interact(item, world) {
+        world.message = "I don't think those two items go together.";
+    }
+    
 }
 
 export default GameObject;

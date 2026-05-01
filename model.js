@@ -6,5 +6,6 @@ export const world = {
     player: new Player(),
     objects: {},
     selectedItem: null,
-    message: "You wake up..."
+    message: "You wake up...",
+    selectedInventoryItem: null
 }

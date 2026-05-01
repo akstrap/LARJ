@@ -18,6 +18,8 @@ import {world} from './model.js';
  let openHints
  let openExits
  let toggleItems
+ let inventoryPanel
+ let itemsToggleIcon
 
  const state = {
   itemsCollapsed: true,
@@ -49,6 +51,10 @@ import {world} from './model.js';
     hintNext = document.querySelector("#hint-next");
     openHints = document.querySelector("#open-hints");
     openExits = document.querySelector("#open-exits");
+    inventoryPanel = document.querySelector("#inventory-panel");
+    itemsToggleIcon = document.querySelector("#items-toggle-icon");
+
+    bindEvents();
 
     return {
         roomNameEl,
@@ -68,7 +74,9 @@ import {world} from './model.js';
         hintNext,
         openHints,
         openExits,
-        toggleItems
+        toggleItems,
+        inventoryPanel,
+        itemsToggleIcon
     }
 
  }
@@ -89,8 +97,8 @@ import {world} from './model.js';
       renderItemsPanel();
     });
 
-    openHints.addEventListener("click", () => state.openModal("hint"));
-    openExits.addEventListener("click", () => state.openModal("exits"));
+    openHints.addEventListener("click", () => openModal("hint"));
+    openExits.addEventListener("click", () => openModal("exits"));
 
     hintPrev.addEventListener("click", () => {
       state.currentHint = Math.max(0, state.currentHint - 1);
@@ -131,58 +139,148 @@ import {world} from './model.js';
     });
   }
 
+  function renderItemsPanel() {
+    const isExpanded = !state.itemsCollapsed;
+    toggleItems.setAttribute("aria-expanded", String(isExpanded));
+    inventoryPanel.classList.toggle("sidebar__panel--collapsed", state.itemsCollapsed);
+    itemsToggleIcon.textContent = isExpanded ? "-" : "+";
+  }
+
+  function renderHints() {
+    const unlockableHintIndex = getUnlockableHintIndex();
+    const isResolved = isHintResolved();
+    hintTextEl.textContent = isResolved ? this.scene.hints[this.state.currentHint] : "";
+    hintCardEl.classList.toggle("hint-card--locked", !isResolved);
+    hintCardEl.classList.toggle("hint-card--revealed", isResolved);
+    hintTextEl.classList.toggle("modal__copy--locked", !isResolved);
+    hintReveal.disabled =
+      isResolved || state.hintCreditsRemaining < 1 || state.currentHint !== unlockableHintIndex;
+    hintIndex.textContent = `1/${state.hintCreditsRemaining}`;
+    hintPrev.disabled = state.currentHint === 0;
+    hintNext.disabled = state.currentHint >= unlockableHintIndex;
+  }
+
+  function isHintResolved() {
+    return Boolean(state.resolvedHints[state.currentHint]);
+  }
+
+  function setActiveHintIndex() {
+    state.currentHint = getUnlockableHintIndex();
+  }
+
+  function getUnlockableHintIndex() {
+    const nextUnresolvedIndex = hints.findIndex((_, index) => !state.resolvedHints[index]);
+    return nextUnresolvedIndex === -1 ? hints.length - 1 : nextUnresolvedIndex;
+  }
+
+  function openModal(name) {
+    state.openModal = name;
+    modalOverlay.classList.remove("hidden");
+    modalOverlay.setAttribute("aria-hidden", "false");
+    hintModal.classList.toggle("hidden", name !== "hint");
+    exitsModal.classList.toggle("hidden", name !== "exits");
+
+    if (name === "hint") {
+      setActiveHintIndex();
+      renderHints();
+    }
+  }
+
+  function closeModal() {
+    state.openModal = null;
+    modalOverlay.classList.add("hidden");
+    modalOverlay.setAttribute("aria-hidden", "true");
+    hintModal.classList.add("hidden");
+    exitsModal.classList.add("hidden");
+  }
+
 
   function renderRoom(room) {
     roomNameEl.textContent = room.name;
-    let text = room.description;
-    const usedObjects = new Set();
     roomDescEl.innerHTML = "";
 
-    room.getContents().forEach(obj => {
-        const name = obj.name.toLowerCase();
-        const lowerText = text.toLowerCase();
+    console.log("Room contents: ", room.getContents())
+    const text = room.description;
 
-        if (lowerText.includes(name)) {
-            const parts = text.split(name);
-            if (parts[0]) {
-                roomDescEl.append(document.createTextNode(parts[0]))
-            }
+    // match [label:id] OR [id]
+    const regex = /\[(.*?)\]/g;
+
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        const fullMatch = match[0];
+        const content = match[1];
+
+        // add text before match
+        roomDescEl.append(
+            document.createTextNode(text.slice(lastIndex, match.index))
+        );
+
+        let label, id;
+
+        if (content.includes(":")) {
+            [label, id] = content.split(":");
+        } else {
+            label = content;
+            id = content;
+        }
+
+        const obj = world.objects[id];
+
+        if (obj) {
             const btn = document.createElement("button");
             btn.className = "description-link";
-            btn.textContent = name;
+            btn.textContent = label;
             btn.dataset.item = obj.id;
+
             roomDescEl.append(btn);
-            usedObjects.add(obj.id)
-            text = parts.slice(1).join(name);
+        } else {
+            // fallback if object missing
+            roomDescEl.append(document.createTextNode(label));
+        }
+
+        lastIndex = match.index + fullMatch.length;
+    }
+
+    // remaining text
+    roomDescEl.append(
+        document.createTextNode(text.slice(lastIndex))
+    );
+
+    renderRemainingContents(room);
+}
+
+
+  function renderRemainingContents(room) {
+    const describedIds = [...room.description.matchAll(/\[(.*?)\]/g)]
+        .map(match => {
+            const content = match[1];
+            return content.includes(":") ? content.split(":")[1] : content;
+        });
+
+    const remaining = room.getContents().filter(
+        obj => !describedIds.includes(obj.id)
+    );
+
+    if (remaining.length === 0) return;
+
+    roomDescEl.append(document.createElement("br"));
+    roomDescEl.append(document.createTextNode("You also see: "));
+
+    remaining.forEach((obj, i) => {
+        const btn = document.createElement("button");
+        btn.className = "description-link";
+        btn.textContent = obj.name;
+        btn.dataset.item = obj.id;
+
+        roomDescEl.append(btn);
+
+        if (i < remaining.length - 1) {
+            roomDescEl.append(document.createTextNode(", "));
         }
     });
-
-    if (text) {
-        roomDescEl.append(document.createTextNode(text));
-    }
-
-    const remaining = room.getContents().filter(obj => !usedObjects.has(obj.id));
-
-    if (remaining.length > 0) {
-        roomDescEl.append(document.createElement("br"));
-
-        const prefix = document.createTextNode("You also see: ");
-        roomDescEl.append(prefix);
-
-        remaining.forEach((obj, index) => {
-            const btn = document.createElement("button");
-            btn.className = "description-link";
-            btn.textContent = obj.name;
-            btn.dataset.item = obj.id;
-
-            roomDescEl.append(btn);
-
-            if (index < remaining.length -1) {
-                roomDescEl.append(document.createTextNode(", "))
-            }
-        })
-    }
-  }
+}
 
   function renderInventory() {
     inventoryEl.innerHTML = "";
@@ -214,7 +312,7 @@ import {world} from './model.js';
         btn.type = "button";
         btn.className = "button action-button";
         btn.textContent = action.name;
-        btn.dataset.action = index;
+        btn.dataset.action = action.name;
 
         actionBarEl.append(btn)
     })

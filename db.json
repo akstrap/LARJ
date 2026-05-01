@@ -20,7 +20,7 @@
         "room": {
             "id": "room",
             "name": "?",
-            "description": "A small dimly lit room. There is a knob on the wall next to the single door.",
+            "description": "A small dimly lit room. There is a [knob] on the wall next to the single door.",
             "exits": {
                 "west": "unknown"
             },
@@ -29,7 +29,7 @@
         "great-hall": {
             "id": "great-hall",
             "name": "Great Hall",
-            "description": "An expansive main room with a huge table in the middle surrounded by chairs",
+            "description": "An expansive main room with a huge [table] in the middle surrounded by chairs. There is a large [chair] at the head of the table.",
             "exits": {
                 "east": "room",
                 "west": "throne-room",
@@ -43,7 +43,7 @@
         "throne-room": {
             "id": "throne-room",
             "name": "Throne Room",
-            "description": "A grand room with a majestic throne on a raised platform on one end.",
+            "description": "A grand room with a majestic [throne] on a raised platform on one end with a [curtain] behind it. There is a skeleton with a [crown] on its lap on the throne. The floor is lined with a [grand rug:grand-rug].",
             "exits": {
                 "east": "great-hall",
                 "west": "bedroom"
@@ -53,7 +53,7 @@
         "bedroom": {
             "id": "bedroom",
             "name": "Bedroom",
-            "description": "A lavish royal bedchamber. The curtained bed sits in the middle of the room.",
+            "description": "A lavish royal bedchamber. The curtained [bed] sits in the middle of the room. A massive gilded [wardrobe] sits against one wall.",
             "exits": {
                 "east": "throne-room"
             },
@@ -62,7 +62,7 @@
         "bathroom": {
             "id": "bathroom",
             "name": "Bathroom",
-            "description": "An elegant bathroom with gilded appliances.",
+            "description": "An elegant bathroom with a gilded [toilet], [sink], and [tub].",
             "exits": {
                 "north": "great-hall"
             },
@@ -71,7 +71,7 @@
         "courtyard": {
             "id": "courtyard",
             "name": "Courtyard",
-            "description": "A beautifully planted yard with a fountain in the middle and a hedge maze.",
+            "description": "A beautifully planted yard with a [fountain] in the middle and a [hedge maze:hedges].",
             "exits": {
                 "south": "great-hall"
             },
@@ -80,7 +80,7 @@
         "interior": {
             "id": "interior",
             "name": "Wooden Shack",
-            "description": "A worn-down room with a cauldron in the center. Dried herbs hang from the ceiling. One wall is entirely bookcases.",
+            "description": "A worn-down room with a [cauldron] in the center. [Dried herbs:dried-herbs] hang from the ceiling. One wall is entirely [bookshelves].",
             "exits": {
                 "east": "room",
                 "north": "yard",
@@ -91,7 +91,7 @@
         "yard": {
             "id": "yard",
             "name": "Yard",
-            "description": "A small outdoor space enclosed by fences. There is a garden bed in one half and the embers of a bonfire.",
+            "description": "A small outdoor space enclosed by fences. There is a [garden] in one half and the embers of a [bonfire].",
             "exits": {
                 "south": "interior"
             },
@@ -100,7 +100,7 @@
         "forest": {
             "id": "forest",
             "name": "Forest",
-            "description": "An old forest with huge trees and deep undergrowth.",
+            "description": "An old forest with huge trees and deep [undergrowth].",
             "exits": {
                 "north": "interior"
             },
@@ -109,7 +109,7 @@
         "square": {
             "id": "square",
             "name": "Village Square",
-            "description": "A central area of a village that is very empty. There is a large statue in the center with a mule hitched to it.",
+            "description": "A central area of a village that is very empty. There is a large [statue] in the center with a [mule] hitched to it.",
             "exits": {
                 "east": "room",
                 "west": "blacksmith",
@@ -120,7 +120,7 @@
         "food-stall": {
             "id": "food-stall",
             "name": "Food Stall",
-            "description": "A wooden stall that advertises food for sale. There is no one here.",
+            "description": "A wooden stall that advertises food for sale. A group of [crows] surrounds it.",
             "exits": {
                 "south": "square"
             },
@@ -129,7 +129,7 @@
         "blacksmith": {
             "id": "blacksmith",
             "name": "Blacksmith",
-            "description": "A clearly well used smithy. Tools have been left around, there appear to still be some coals alive in the furnace.",
+            "description": "A clearly well used smithy. Tools have been left around on the [workbench], there appear to still be some coals alive in the [furnace].",
             "exits": {
                 "east": "square"
             },
@@ -218,7 +218,7 @@
             "contents": ["courtyard-key"]
         },
         "chair": {
-            "id": "wooden-chair",
+            "id": "chair",
             "name": "Chair",
             "description": "A wooden chair like the many others around the table. There is a cushion on the seat.",
             "location": "great-hall",
@@ -228,11 +228,12 @@
             "contents": ["blue-jewel"]
         },
         "table": {
-            "id": "great-table",
+            "id": "table",
             "name": "Huge Table",
             "description": "A huge table with the remnants of a feast, with carrots, bread, and a jug",
             "location": "great-hall",
-            "contents": ["carrot", "bread", "jug"]
+            "contents": ["carrot", "bread", "jug"],
+            "opened": true
         },
         "grand-rug": {
             "id": "grand-rug",
@@ -279,14 +280,16 @@
             "name": "Dried Herbs",
             "description": "A bundle of dried herbs hanging from the ceiling.",
             "location": "interior",
-            "contents": ["mandrake-root", "blackthorn", "belladonna"]
+            "contents": ["mandrake-root", "blackthorn", "belladonna"],
+            "opened": true
          },
         "bookshelves": {
             "id": "bookshelves",
             "name": "Bookshelves",
             "description": "A wall of bookshelves filled with dusty old tomes.",
             "location": "interior",                
-            "contents": ["ring-production-book", "how-to-fly-book", "mind-control-book"]
+            "contents": ["ring-production-book", "how-to-fly-book", "mind-control-book"],
+            "opened": true
         },
         "bonfire": {
             "id": "bonfire",
@@ -303,21 +306,24 @@
             "name": "Garden",
             "description": "A small garden bed with a few flowers and vegetables growing in it.",
             "location": "yard",
-            "contents": ["sunflower", "barley"]
+            "contents": ["sunflower", "barley"],
+            "opened": true
         },
         "undergrowth": {
             "id": "undergrowth",
             "name": "Undergrowth",
             "description": "A rotted log with mushrooms growing on it lies in the undergrowth. A group of toads peers up at you from beside it.",
             "location": "forest",
-            "contents": ["toad", "mushroom"]
+            "contents": ["toad", "mushroom"],
+            "opened": true
         },
         "workbench": {
             "id": "workbench",
             "name": "Workbench",
             "description": "A well-used workbench with various old tools and creations scattered on top.",
             "location": "blacksmith",
-            "contents": ["old-sword", "horseshoes"]
+            "contents": ["old-sword", "horseshoes"],
+            "opened": true
         }
     },
     "items": {

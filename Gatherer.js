@@ -9,12 +9,13 @@ class Gatherer extends Container {
         this.hiddenContents = data.hiddenContents || [];
     }
 
-    interact(itemId, world) {
-        if (this.interactions[itemId]) {
-            const item = world.objects[itemId]
+    interact(item, world) {
+        if (this.interactions[item.id]) {
             this.contents.push(item);
             world.player.removeChild(item);
-            world.message = this.interactions[itemId];
+            world.message = this.interactions[item.id];
+            world.selectedItem = null;
+            world.selectedInventoryItem = null;
             const condition = this.checkConditions();
             if (condition) {
                 this.applyCondition(condition, world);

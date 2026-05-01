@@ -88,9 +88,13 @@ function linkWorld() {
 
     Object.values(world.rooms).forEach(room => {
         for (const dir in room.exits) {
+            const target = room.exits[dir];
+            if (target === "unknown") continue;
             room.exits[dir] = world.rooms[room.exits[dir]];
         }
         for (const dir in room.lockedExits) {
+            const target = room.exits[dir];
+            if (target === "unknown") continue;
             room.lockedExits[dir] = world.rooms[room.lockedExits[dir]];
         }
     })
@@ -121,34 +125,43 @@ function handleClick(e) {
 
     const actionBtn = e.target.closest("[data-action]");
     if (actionBtn) return handleAction(actionBtn.dataset.action)
+
+    //const inventoryBtn = e.target.closest("[data-inventory]");
+    //if (inventoryBtn) return handleInventory(inventoryBtn.dataset.item)
 }
 
 function handleExit(dir) {
     const room = world.currentRoom;
     let dest = room.getExit(dir);
 
+    console.log("EXIT CLICKED:", dir);
+    console.log("CURRENT ROOM:", room);
+    console.log("EXIT VALUE:", room.getExit(dir));
+
     if (dest === "unknown") {
         dest = resolveUnknownExit(room, dir);
     }
     if (!dest) return;
 
+    console.log("Dest:", dest)
     world.currentRoom = dest;
     world.selectedItem = null;
     world.message = `You moved ${dir}`
+    world.selectedInventoryItem = null;
 
     render();
 }
 
 function handleItem(itemId) {
-    const item = world.items[itemId]
-    if (!world.selectedItem) {
+    const item = world.objects[itemId]
+    if (!world.selectedInventoryItem) {
         world.selectedItem = item
         world.message = item.description
         render();
         return;
     }
     else {
-        item.interact(world.selectedItem.id, world);
+        item.interact(world.selectedInventoryItem, world);
         render();
     }
 }
@@ -157,12 +170,23 @@ function handleAction(actionId) {
     const item = world.selectedItem;
     if (!item) return;
     const actions = item.getActions(world)
-    const action = actions[actionId];
+    const action = actions.find(a => a.name === actionId);
 
     if (!action) return;
 
     action.handler(world);
 
-    world.selectedItem = null;
     render();
+}
+
+function resolveUnknownExit(room, dir) {
+    if (room.id !== "room") return;
+    const knob = world.objects["knob"];
+
+    switch (knob.selectedSide) {
+            case "castle": return world.rooms["great-hall"];
+            case "wooden-shack": return world.rooms["interior"];
+            case "village-square": return world.rooms["square"];
+        }
+
 }

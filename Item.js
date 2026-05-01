@@ -16,14 +16,14 @@ class Item extends GameObject {
 
     drop(world) {
         world.player.removeChild(this);
-        world.player.location.addChild(this);
-        this.setLocation(world.player.location);
+        world.currentRoom.addChild(this);
+        this.setLocation(world.currentRoom);
 
         world.message = `You dropped the ${this.name}.`
     }
 
     use(world) {
-
+        world.selectedInventoryItem = this;
     }
 
     canTake() {
@@ -32,7 +32,6 @@ class Item extends GameObject {
 
     getActions(world) {
         const actions = super.getActions(world);
-        const currentRoom = world.currentRoom;
 
         if (this.location === world.player) {
             actions.push({
@@ -45,7 +44,7 @@ class Item extends GameObject {
                     handler: (world) => this.use(world)
                 })
             }
-        } else if (this.location === currentRoom) {
+        } else {
             actions.push({
                 name: `Take ${this.name}`,
                 handler: (world) => this.take(world)

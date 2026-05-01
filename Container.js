@@ -1,10 +1,12 @@
 import GameObject from "./GameObject.js"
+import { render } from "./view.js"
 
 class Container extends GameObject {
     constructor(data) {
         super(data);
         this.contents = data.contents || [];
         this.action = data.action || {};
+        this.opened = data.opened || false;
     }
 
     addChild(item) {
@@ -30,21 +32,32 @@ class Container extends GameObject {
     getActions(world) {
         const actions = super.getActions(world)
 
-        if (this.action) {
+        if (!this.opened) {
+            const key = Object.keys(this.action)[0];
             actions.push({
-                name: Object.keys(this.action)[0],
-                handler: (world) => handleAction(world)
-        })
-        } else {
-            this.contents.forEach(item => {
-                actions.push(item.getActions())
-            })
-        }
-    }
+                name: key,
+                handler: (world) => {
+                    
+                    this.opened = true;
+                    world.selectedItem = this;
+                    world.message = this.action[key];
 
-    handleAction(world) {
-        world.message = this.action[0];
-        this.action.filter(this.action[0])
+                    render();
+                }
+            })
+        return actions;
+        }
+        for (const item of this.contents) {
+            if (!item) continue;
+
+            const childActions = item.getActions(world);
+
+            if (Array.isArray(childActions)) {
+                actions.push(...childActions);
+            }
+        }
+
+        return actions;
     }
 
 }
