@@ -134,6 +134,12 @@
                 "east": "square"
             },
             "contents": ["furnace", "workbench"]
+        },
+        "end": {
+            "id": "end",
+            "name": "The End",
+            "description": "You have found your way out into a world that you recognize. Congratulations, you found your way home!",
+            "contents": ["trophy"]
         }
     },
     "interactables": {
@@ -529,6 +535,13 @@
             "description": "A broken piece of ring made out of bronze",
             "location": "mule",
             "usable": true
+        },
+        "trophy": {
+            "id": "trophy",
+            "name": "Escape Trophy",
+            "description": "A large silver trophy engraved with 'Congratulations, you escaped!'",
+            "location": "end",
+            "usable": false
         }
     },
     "gatherers": {
@@ -552,7 +565,8 @@
                     "reveal": ["ring-portion-castle"],
                     "newAction": {
                         "Place on skeleton's head": "You place the crown on the skeleton's head, and it glows. The skeleton's hand uncurls, revealing what appears to be a piece of broken ring."
-                    }
+                    },
+                    "hide": ["blue-jewel", "green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"]
                 },
                 "missing-blue-jewel": {
                     "contains": ["green-jewel", "yellow-jewel", "red-jewel", "purple-jewel"],
@@ -580,7 +594,8 @@
                     "reveal": []
                 }
             },
-            "hiddenContents": ["ring-portion-castle"]
+            "hiddenContents": ["ring-portion-castle"],
+            "opened": true
         },
         "crows": {
             "id": "crows",
@@ -597,10 +612,12 @@
                 "full": {
                     "contains": ["bread"],
                     "newDescription": "The crows are happily pecking at the bread. There is a note revealed on the counter, with a feather left next to it.",
-                    "reveal": ["note", "feather"]
+                    "reveal": ["note", "feather"],
+                    "hide": ["bread"]
                 }
             },
-            "hiddenContents": ["note", "feather"]
+            "hiddenContents": ["note", "feather"],
+            "opened": true
         },
         "cauldron": {
             "id": "cauldron",
@@ -627,20 +644,22 @@
                     "newAction": {
                         "Stir": "You give the contents a stir, and they bubble and a piece of broken ring floats to the top."
                     },
-                    "reveal": ["ring-portion-shack"]
+                    "reveal": ["ring-portion-shack"],
+                    "hide": ["blackthorn", "mushroom", "jug", "ashes"]
                 },
                 "fly-potion": {
                     "contains": ["belladonna", "sunflower", "toad"],
-                    "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add water.",
+                    "newDescription": "Unfortunately, there is no way for you to add water, so this potion isn't producible.",
                     "reveal": []
                 },
                 "mind-potion": {
                     "contains": ["feather", "straw-doll", "mandrake-root"],
-                    "newDescription": "The cauldron is full. Unfortunately, there is no way for you to add something belonging to another person you're trying to control.",
+                    "newDescription": "Unfortunately, there is no way for you to add something belonging to another person you're trying to control.",
                     "reveal": []
                 }
             },
-            "hiddenContents": ["ring-portion-shack"]
+            "hiddenContents": ["ring-portion-shack"],
+            "opened": true
         },
         "mule": {
             "id": "mule",
@@ -656,12 +675,19 @@
              },
              "conditions": {
                 "fed": {
-                    "contains": ["carrot", "barley", "horseshoes", "harness"],
-                    "newDescription": "The mule is happily munching on the carrot and barley, and seems to really like the horseshoes. You decide to release it to be free.",
-                    "reveal": ["ring-portion-village"]
+                    "contains": ["carrot", "barley"],
+                    "newDescription": "The mule is happily munching on the carrot and barley.",
+                    "reveal": []
+                },
+                "shoed": {
+                    "contains": ["carrot", "barley", "harness", "horseshoes"],
+                    "newDescription": "The mule is fully satisfied and gallops away, leaving a piece of ring behind.",
+                    "reveal": ["ring-portion-village"],
+                    "hide": ["carrot", "barley", "harness", "horseshoes"]
                 }
              },
-             "hiddenContents": ["ring-portion-village"]
+             "hiddenContents": ["ring-portion-village"],
+             "opened": true
         },
         "statue": {
             "id": "statue",
@@ -676,10 +702,12 @@
                 "sword": {
                     "contains": ["old-sword"],
                     "newDescription": "The statue now brandishes a sword, and the horse's harness has been released from it.",
-                    "reveal": ["harness"]
+                    "reveal": ["harness"],
+                    "hide": ["old-sword"]
                 }
             },
-            "hiddenContents": ["harness"]
+            "hiddenContents": ["harness"],
+            "opened": true
         }
     },
     "doors": {
@@ -689,9 +717,9 @@
             "description": "A hidden door revealed from behind the curtain. It is locked, but has a ring-shaped indentation in the center.",
             "location": "throne-room",
             "interact": {
-                "ring-portion-castle": "You place the piece of ring from the castle in the indentation, and it fits perfectly. The door unlocks and opens to reveal a hidden room.",
-                "ring-portion-shack": "You place the piece of ring from the shack in the indentation, but it doesn't fit.",
-                "ring-portion-village": "You place the piece of ring from the village in the indentation, but it doesn't fit."
+                "ring-portion-castle": "You place the piece of ring from the castle in the indentation, and it fits perfectly, filling exactly one third of the indentation.",
+                "ring-portion-shack": "You place the piece of ring from the shack in the indentation, and it fits perfectly, filling exactly one third of the indentation.",
+                "ring-portion-village": "You place the piece of ring from the village in the indentation, and it fits perfectly filling exactly one third of the indentation."
              },
              "conditions": {
                 "unlocked": {
@@ -699,7 +727,7 @@
                     "newDescription": "The secret door is now unlocked and open, revealing a hidden room.",
                     "reveal": [],
                     "unlockExit": {
-                        "south": "The End"
+                        "south": "end"
                     }
                 }
              }

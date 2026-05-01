@@ -17,7 +17,7 @@ class Gatherer extends Container {
             world.message = this.interactions[item.id];
             world.selectedItem = null;
             world.selectedInventoryItem = null;
-            const condition = this.checkConditions();
+            const condition = this.checkConditions(world);
             console.log("Condition:", condition)
             if (condition) {
                 this.applyCondition(condition, world);
@@ -28,29 +28,30 @@ class Gatherer extends Container {
         }
     }
 
-    checkConditions() {
-    for (const key in this.conditions) {
-      const condition = this.conditions[key];
-      console.log("Contents:", this.contents)
-      console.log("key:", key)
-      console.log("condition:", condition)
-      if (condition.contains.every(id => this.contents.some(item => item.id === id))) {
-        return condition;
-      }
-    }
-    return null;
+    checkConditions(world) {
+        for (const key in this.conditions) {
+            const condition = this.conditions[key];
+
+            const contentIds = this.contents.map(item => item.id);
+
+            const hasAllRequired = condition.contains.every(id =>
+                contentIds.includes(id)
+            );
+      
+            const hasNoExtras = contentIds.every(id =>
+                condition.contains.includes(id)
+            );
+
+            if (hasAllRequired && hasNoExtras) {
+                return condition;
+            }
+        }
+        return null;
     }
 
     getActions(world) {
+        this.checkConditions();
         const actions = super.getActions(world);
-        const actionName = Object.keys(this.action)[0];
-        if (actionName) {
-            actions.push({
-                name: actionName,
-                handler: () => world.message = this.action[actionName]
-        })
-        }
-
         return actions;
     }
 
@@ -69,8 +70,16 @@ class Gatherer extends Container {
                 this.hiddenContents = this.hiddenContents.filter(hiddenId => hiddenId !== id);
             })
         }
+        if (condition.hide) {
+            condition.hide.forEach(id => {
+                const obj = world.objects[id];
+                this.hiddenContents.push(id)
+                this.removeChild(obj);
+            })
+        }
         if (condition.newAction) {
             this.action = condition.newAction;
+            this.opened = false;
         }
         if (!condition.newAction) {
             this.opened = true;

@@ -4,6 +4,7 @@ class Interactable extends GameObject {
     constructor(data) {
         super(data);
         this.action = data.action || {};
+        this.newExit = data.newLockedExit || null;
     }
 
     getActions(world) {
@@ -20,6 +21,14 @@ class Interactable extends GameObject {
 
     use(world, actionName) {
         world.message = this.action[actionName] || "Nothing happens.";
+        if (this.newExit) {
+            const room = this.location;
+            const door = world.objects["secret-door"]
+            room.addChild(door);
+            const dir = Object.keys(this.newExit)[0]
+            room.lockedExits[dir] = this.newExit[dir]
+            this.newExit = null;
+        }
     }
 }
 
