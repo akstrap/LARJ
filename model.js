@@ -6,6 +6,12 @@ export const world = {
     player: new Player(),
     objects: {},
     selectedItem: null,
-    message: "You wake up...",
-    selectedInventoryItem: null
+    message: "",
+    selectedInventoryItem: null,
+    messages: {}
+}
+
+export function setWorldMessages(messages = {}) {
+    world.messages = messages;
+    world.message = messages.initialWorldMessage;
 }

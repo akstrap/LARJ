@@ -52,6 +52,7 @@ textarea {
 .screen__main {
   display: grid;
   grid-template-rows: 1fr auto;
+  gap: 32px;
   min-height: 0;
 }
 
@@ -97,6 +98,29 @@ textarea {
   outline: none;
 }
 
+.item-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  pointer-events: none;
+  max-width: min(280px, calc(100vw - 36px));
+  padding: 8px 12px;
+  border: 2px solid var(--text);
+  background: var(--bg);
+  color: var(--text);
+  font-size: clamp(1rem, 1.25vw, 1.35rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.item-cursor.hidden {
+  display: none;
+}
+
 .action-panel {
   border: 1px solid rgba(245, 245, 245, 0.88);
   margin: 0 8px;
@@ -129,7 +153,7 @@ textarea {
   padding: 12px 26px;
   font-size: clamp(1.4rem, 1.7vw, 2.25rem);
   line-height: 1;
-  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease;
+  transition: opacity 120ms ease, background-color 120ms ease;
 }
 
 .button:hover,
@@ -143,7 +167,6 @@ textarea {
 .hint-button:hover,
 .hint-button:focus-visible {
   outline: none;
-  transform: translateY(-1px);
 }
 
 .button--dark,
@@ -189,18 +212,19 @@ textarea {
 }
 
 .sidebar__toggle {
-  width: 100%;
-  display: flex;
+  width: fit-content;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 22px;
   cursor: pointer;
 }
 
 .sidebar__toggle-icon {
   display: inline-block;
-  min-width: 1ch;
+  min-width: 1.2ch;
   text-align: center;
-  color: var(--muted);
+  color: var(--text);
 }
 
 .sidebar__link {
@@ -227,7 +251,54 @@ textarea {
 
 .sidebar__list {
   display: grid;
-  gap: 14px;
+  gap: 18px;
+  width: min(100%, 430px);
+  max-height: clamp(220px, 48vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0;
+  scrollbar-gutter: auto;
+  scrollbar-color: #f5f5f5 rgba(245, 245, 245, 0.18);
+  scrollbar-width: auto;
+}
+
+.sidebar__list--scrollable {
+  padding-right: 18px;
+  border-right: 4px solid rgba(245, 245, 245, 0.28);
+  box-shadow: inset -10px 0 0 rgba(245, 245, 245, 0.06);
+  scrollbar-gutter: stable;
+}
+
+.sidebar__list::-webkit-scrollbar {
+  width: 16px;
+}
+
+.sidebar__list::-webkit-scrollbar-track {
+  background: rgba(245, 245, 245, 0.18);
+  border-left: 1px solid rgba(245, 245, 245, 0.26);
+}
+
+.sidebar__list::-webkit-scrollbar-thumb {
+  background: #f5f5f5;
+  border-radius: 999px;
+  border: 4px solid #383d45;
+}
+
+.sidebar__list::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+
+.inventory-group {
+  display: grid;
+  gap: 10px;
+}
+
+.inventory-group__title {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.2rem, 1.35vw, 1.55rem);
+  line-height: 1;
+  font-weight: 700;
 }
 
 .sidebar__list--muted {
@@ -245,10 +316,23 @@ textarea {
   font-size: clamp(1.75rem, 2vw, 2.6rem);
   line-height: 1;
   padding: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .sidebar__item.is-active {
   color: var(--highlight);
+}
+
+.sidebar__item-name,
+.sidebar__item-origin {
+  display: block;
+}
+
+.sidebar__item-origin {
+  color: rgba(245, 245, 245, 0.58);
+  font-size: clamp(1rem, 1.2vw, 1.35rem);
+  line-height: 1;
 }
 
 .hint-button {
@@ -413,8 +497,8 @@ textarea {
 }
 
 .exit-node {
-  width: 220px;
-  min-height: 118px;
+  width: clamp(240px, 18vw, 320px);
+  min-height: 132px;
   border-radius: 999px;
   border: 3px solid var(--bg);
   background: transparent;
@@ -422,10 +506,13 @@ textarea {
   cursor: pointer;
   display: grid;
   place-items: center;
-  padding: 16px 18px;
+  padding: 18px 24px;
   text-align: center;
-  font-size: clamp(1.5rem, 2vw, 2.6rem);
-  line-height: 1.05;
+  font-size: clamp(1.4rem, 1.8vw, 2.25rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  white-space: normal;
 }
 
 .exit-node[data-slot="north"] {
@@ -517,6 +604,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .sidebar__list {
+    max-height: 220px;
+  }
+
   .modal {
     padding: 24px 18px 22px;
   }
@@ -547,6 +638,6 @@ textarea {
   }
 
   .exit-node {
-    width: min(100%, 260px);
+    width: min(100%, 320px);
   }
 }

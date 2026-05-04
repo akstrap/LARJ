@@ -1,4 +1,7 @@
-import {world} from './model.js'; 
+import {world} from './model.js';
+import Hint from "./Hint.js";
+import { formatText } from "./TextTemplate.js";
+import "https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js";
 
  let roomNameEl
  let roomDescEl
@@ -20,18 +23,40 @@ import {world} from './model.js';
  let toggleItems
  let inventoryPanel
  let itemsToggleIcon
+ let itemCursorEl
+
+	 let hintSystem;
+	 let viewMessages = {};
+   let isClosingModal = false;
+   let modalMotionToken = 0;
+   let motionBound = false;
+   let cursorMotionToken = 0;
+
+   const motionButtonSelector = [
+    ".button",
+    ".action-button",
+    ".sidebar__item",
+    ".sidebar__link",
+    ".sidebar__toggle",
+    ".exit-node",
+    ".hint-button",
+    ".hint-card__action",
+    ".description-link"
+   ].join(",");
 
  const state = {
   itemsCollapsed: true,
   selectedExitId: null,
-  currentHint: 0,
-  hintCreditsRemaining: 3,
-  resolvedHints: [],
-  openModal: null
+  openModal: null,
+  pointerX: 0,
+  pointerY: 0,
+  hasPointer: false,
+  itemCursorVisible: false
 };
  
 
  export function initView() {
+    hintSystem = new Hint(world);
     roomNameEl = document.querySelector("#room-name");
     roomDescEl = document.querySelector("#room-description");
     messageEl = document.querySelector("#message-text");
@@ -53,8 +78,10 @@ import {world} from './model.js';
     openExits = document.querySelector("#open-exits");
     inventoryPanel = document.querySelector("#inventory-panel");
     itemsToggleIcon = document.querySelector("#items-toggle-icon");
+    itemCursorEl = document.querySelector("#item-cursor");
 
     bindEvents();
+    bindMotion();
 
     return {
         roomNameEl,
@@ -76,9 +103,18 @@ import {world} from './model.js';
         openExits,
         toggleItems,
         inventoryPanel,
-        itemsToggleIcon
+        itemsToggleIcon,
+        itemCursorEl
     }
 
+ }
+
+ export function setHintDefinitions(definitions, conditionTemplates) {
+    hintSystem.setDefinitions(definitions, conditionTemplates);
+ }
+
+ export function setViewMessages(messages) {
+    viewMessages = messages || {};
  }
 
  export function render() {
@@ -89,6 +125,7 @@ import {world} from './model.js';
     renderActions();
     renderMessage();
     renderExits(room);
+    renderItemCursor();
  }
 
  function bindEvents() {
@@ -101,22 +138,17 @@ import {world} from './model.js';
     openExits.addEventListener("click", () => openModal("exits"));
 
     hintPrev.addEventListener("click", () => {
-      state.currentHint = Math.max(0, state.currentHint - 1);
+      hintSystem.previous();
       renderHints();
     });
 
     hintNext.addEventListener("click", () => {
-      state.currentHint = Math.min(getUnlockableHintIndex(), state.currentHint + 1);
+      hintSystem.next();
       renderHints();
     });
 
     hintReveal.addEventListener("click", () => {
-      if (isHintResolved() || state.hintCreditsRemaining < 1) {
-        return;
-      }
-
-      state.hintCreditsRemaining -= 1;
-      state.resolvedHints[state.currentHint] = true;
+      hintSystem.reveal();
       renderHints();
     });
 
@@ -137,6 +169,17 @@ import {world} from './model.js';
         closeModal();
       }
     });
+
+    window.addEventListener("resize", updateInventoryScrollState);
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerdown", handlePointerMove);
+  }
+
+  function handlePointerMove(event) {
+    state.pointerX = event.clientX;
+    state.pointerY = event.clientY;
+    state.hasPointer = true;
+    updateItemCursorPosition();
   }
 
   function renderItemsPanel() {
@@ -144,36 +187,24 @@ import {world} from './model.js';
     toggleItems.setAttribute("aria-expanded", String(isExpanded));
     inventoryPanel.classList.toggle("sidebar__panel--collapsed", state.itemsCollapsed);
     itemsToggleIcon.textContent = isExpanded ? "-" : "+";
+    updateInventoryScrollState();
   }
 
   function renderHints() {
-    const unlockableHintIndex = getUnlockableHintIndex();
-    const isResolved = isHintResolved();
-    hintTextEl.textContent = isResolved ? this.scene.hints[this.state.currentHint] : "";
-    hintCardEl.classList.toggle("hint-card--locked", !isResolved);
-    hintCardEl.classList.toggle("hint-card--revealed", isResolved);
-    hintTextEl.classList.toggle("modal__copy--locked", !isResolved);
-    hintReveal.disabled =
-      isResolved || state.hintCreditsRemaining < 1 || state.currentHint !== unlockableHintIndex;
-    hintIndex.textContent = `1/${state.hintCreditsRemaining}`;
-    hintPrev.disabled = state.currentHint === 0;
-    hintNext.disabled = state.currentHint >= unlockableHintIndex;
-  }
-
-  function isHintResolved() {
-    return Boolean(state.resolvedHints[state.currentHint]);
-  }
-
-  function setActiveHintIndex() {
-    state.currentHint = getUnlockableHintIndex();
-  }
-
-  function getUnlockableHintIndex() {
-    const nextUnresolvedIndex = hints.findIndex((_, index) => !state.resolvedHints[index]);
-    return nextUnresolvedIndex === -1 ? hints.length - 1 : nextUnresolvedIndex;
+    const hintView = hintSystem.getViewModel();
+    hintTextEl.textContent = hintView.text;
+    hintCardEl.classList.toggle("hint-card--locked", !hintView.isResolved);
+    hintCardEl.classList.toggle("hint-card--revealed", hintView.isResolved);
+    hintTextEl.classList.toggle("modal__copy--locked", !hintView.isResolved);
+    hintReveal.disabled = hintView.revealDisabled;
+    hintIndex.textContent = hintView.counterText;
+    hintPrev.disabled = hintView.prevDisabled;
+    hintNext.disabled = hintView.nextDisabled;
   }
 
   function openModal(name) {
+    isClosingModal = false;
+    modalMotionToken += 1;
     state.openModal = name;
     modalOverlay.classList.remove("hidden");
     modalOverlay.setAttribute("aria-hidden", "false");
@@ -181,17 +212,234 @@ import {world} from './model.js';
     exitsModal.classList.toggle("hidden", name !== "exits");
 
     if (name === "hint") {
-      setActiveHintIndex();
+      hintSystem.setActiveHintIndex();
       renderHints();
+    }
+
+    playModalOpen(getModalByName(name));
+  }
+
+  async function closeModal() {
+    if (!state.openModal || isClosingModal) return;
+
+    const activeModal = getModalByName(state.openModal);
+    const closeToken = modalMotionToken + 1;
+    modalMotionToken = closeToken;
+    state.openModal = null;
+    isClosingModal = true;
+
+    try {
+        await playModalClose(activeModal);
+    } finally {
+        if (closeToken === modalMotionToken) {
+            hideModals();
+        }
+        isClosingModal = false;
     }
   }
 
-  function closeModal() {
+  function closeModalImmediately() {
+    modalMotionToken += 1;
+    hideModals();
+    isClosingModal = false;
+  }
+
+  function hideModals() {
     state.openModal = null;
     modalOverlay.classList.add("hidden");
     modalOverlay.setAttribute("aria-hidden", "true");
     hintModal.classList.add("hidden");
     exitsModal.classList.add("hidden");
+  }
+
+  function getModalByName(name) {
+    return name === "hint" ? hintModal : exitsModal;
+  }
+
+  function playModalOpen(modal) {
+    if (!modal) return;
+
+    runMotion(modalOverlay, { opacity: [0, 1] }, { duration: 0.16, easing: "ease-out" });
+    runMotion(modal, {
+        opacity: [0, 1],
+        scale: [0.96, 1],
+        y: [18, 0]
+    }, { duration: 0.2, easing: "ease-out" });
+  }
+
+  function playModalClose(modal) {
+    if (!modal) return Promise.resolve();
+
+    return Promise.all([
+        waitForAnimation(modalOverlay, { opacity: [1, 0] }, { duration: 0.12, easing: "ease-in" }),
+        waitForAnimation(modal, {
+            opacity: [1, 0],
+            scale: [1, 0.97],
+            y: [0, 12]
+        }, { duration: 0.14, easing: "ease-in" })
+    ]);
+  }
+
+  function waitForAnimation(element, keyframes, options) {
+    const controls = runMotion(element, keyframes, options);
+
+    if (controls && controls.finished) {
+        return controls.finished;
+    }
+
+    return new Promise(resolve => {
+        window.setTimeout(resolve, (options.duration || 0) * 1000);
+    });
+  }
+
+  function bindMotion() {
+    if (motionBound) return;
+
+    motionBound = true;
+    document.addEventListener("pointerenter", handleMotionEnter, true);
+    document.addEventListener("pointerleave", handleMotionLeave, true);
+    document.addEventListener("pointerdown", handleMotionPress);
+    document.addEventListener("pointerup", handleMotionRelease);
+    document.addEventListener("pointercancel", handleMotionLeave, true);
+    document.addEventListener("focusin", handleMotionEnter);
+    document.addEventListener("focusout", handleMotionLeave);
+  }
+
+  function getMotionButton(event) {
+    const target = event.target.closest?.(motionButtonSelector);
+
+    if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") {
+        return null;
+    }
+
+    return target;
+  }
+
+  function handleMotionEnter(event) {
+    const button = getMotionButton(event);
+    if (!button) return;
+
+    animateButton(button, { scale: 1.03, y: -1 });
+  }
+
+  function handleMotionLeave(event) {
+    const button = getMotionButton(event);
+    if (!button) return;
+
+    animateButton(button, { scale: 1, y: 0 });
+  }
+
+  function handleMotionPress(event) {
+    const button = getMotionButton(event);
+    if (!button) return;
+
+    animateButton(button, { scale: 0.96, y: 1 });
+  }
+
+  function handleMotionRelease(event) {
+    const button = getMotionButton(event);
+    if (!button) return;
+
+    animateButton(button, button.matches(":hover, :focus-visible") ? { scale: 1.03, y: -1 } : { scale: 1, y: 0 });
+  }
+
+  function animateButton(button, keyframes) {
+    runMotion(button, keyframes, { duration: 0.12, easing: "ease-out" });
+  }
+
+  function renderItemCursor() {
+    if (!itemCursorEl) return;
+
+    const heldItem = world.selectedInventoryItem;
+
+    if (!heldItem) {
+        hideItemCursor();
+        return;
+    }
+
+    itemCursorEl.textContent = heldItem.name;
+    updateItemCursorPosition();
+    showItemCursor();
+  }
+
+  function showItemCursor() {
+    if (state.itemCursorVisible) return;
+
+    state.itemCursorVisible = true;
+    cursorMotionToken += 1;
+    itemCursorEl.classList.remove("hidden");
+    runMotion(itemCursorEl, { opacity: [0, 1] }, { duration: 0.12, easing: "ease-out" });
+  }
+
+  async function hideItemCursor() {
+    if (!state.itemCursorVisible) return;
+
+    const hideToken = cursorMotionToken + 1;
+    cursorMotionToken = hideToken;
+    state.itemCursorVisible = false;
+    await waitForAnimation(itemCursorEl, { opacity: [1, 0] }, { duration: 0.1, easing: "ease-in" });
+
+    if (hideToken === cursorMotionToken) {
+        itemCursorEl.classList.add("hidden");
+    }
+  }
+
+  function updateItemCursorPosition() {
+    if (!itemCursorEl || !state.hasPointer) return;
+
+    itemCursorEl.style.transform = `translate3d(${state.pointerX + 18}px, ${state.pointerY + 18}px, 0)`;
+  }
+
+  function runMotion(element, keyframes, options) {
+    const motionAnimate = globalThis.Motion?.animate || globalThis.Motion?.animateMini;
+
+    if (motionAnimate) {
+        return motionAnimate(element, keyframes, options);
+    }
+
+    const animation = element.animate(normalizeWebKeyframes(keyframes), {
+        duration: (options.duration || 0) * 1000,
+        easing: options.easing || "ease",
+        fill: "forwards"
+    });
+
+    return { finished: animation.finished };
+  }
+
+  function normalizeWebKeyframes(keyframes) {
+    if (Array.isArray(keyframes)) return keyframes;
+
+    const frameCount = Object.values(keyframes).reduce((count, value) => {
+        return Math.max(count, Array.isArray(value) ? value.length : 1);
+    }, 1);
+
+    return Array.from({ length: frameCount }, (_, index) => {
+        const frame = {};
+        let y = 0;
+        let scale = 1;
+
+        Object.entries(keyframes).forEach(([property, value]) => {
+            const frameValue = Array.isArray(value) ? value[Math.min(index, value.length - 1)] : value;
+
+            if (property === "y") {
+                y = frameValue;
+                return;
+            }
+
+            if (property === "scale") {
+                scale = frameValue;
+                return;
+            }
+
+            frame[property] = frameValue;
+        });
+
+        if ("y" in keyframes || "scale" in keyframes) {
+            frame.transform = `translateY(${y}px) scale(${scale})`;
+        }
+
+        return frame;
+    });
   }
 
 
@@ -266,7 +514,7 @@ import {world} from './model.js';
     if (remaining.length === 0) return;
 
     roomDescEl.append(document.createElement("br"));
-    roomDescEl.append(document.createTextNode("You also see: "));
+    roomDescEl.append(document.createTextNode(viewMessages.viewAlsoSee));
 
     remaining.forEach((obj, i) => {
         const btn = document.createElement("button");
@@ -285,19 +533,105 @@ import {world} from './model.js';
   function renderInventory() {
     inventoryEl.innerHTML = "";
 
-    world.player.getContents().forEach(obj => {
-        const btn = document.createElement("button");
-        btn.className = "sidebar__item"
-        btn.type = "button"
-        btn.textContent = obj.name;
+    const groups = groupInventoryItems(world.player.getContents());
 
-        if (world.selectedItem === obj) {
-            btn.classList.add("is-active")
-        }
-        btn.dataset.item = obj.id;
+    groups.forEach(group => {
+        const section = document.createElement("section");
+        section.className = "inventory-group";
 
-        inventoryEl.append(btn)
+        const heading = document.createElement("h3");
+        heading.className = "inventory-group__title";
+        heading.textContent = group.name;
+        section.append(heading);
+
+        group.items.forEach(obj => {
+            const btn = document.createElement("button");
+            btn.className = "sidebar__item"
+            btn.type = "button"
+
+            const itemName = document.createElement("span");
+            itemName.className = "sidebar__item-name";
+            itemName.textContent = obj.name;
+            btn.append(itemName);
+
+            const originName = getInventoryOriginName(obj);
+            if (originName) {
+                const itemOrigin = document.createElement("span");
+                itemOrigin.className = "sidebar__item-origin";
+                itemOrigin.textContent = formatText(viewMessages.viewInventoryOrigin, { origin: originName });
+                btn.append(itemOrigin);
+            }
+
+            btn.setAttribute(
+                "aria-label",
+                formatText(originName ? viewMessages.viewInventoryItemWithOriginLabel : viewMessages.viewInventoryItemLabel, {
+                    name: obj.name,
+                    origin: originName
+                })
+            );
+
+            if (world.selectedItem === obj) {
+                btn.classList.add("is-active")
+            }
+            btn.dataset.item = obj.id;
+
+            section.append(btn)
+        });
+
+        inventoryEl.append(section);
     });
+
+    updateInventoryScrollState();
+  }
+
+  function updateInventoryScrollState() {
+    requestAnimationFrame(() => {
+        const hasOverflow = !state.itemsCollapsed && inventoryEl.scrollHeight > inventoryEl.clientHeight + 1;
+        inventoryEl.classList.toggle("sidebar__list--scrollable", hasOverflow);
+    });
+  }
+
+  function groupInventoryItems(items) {
+    const groups = new Map();
+
+    items.forEach(item => {
+        const groupName = getInventoryRoomName(item) || viewMessages.viewUnknown;
+
+        if (!groups.has(groupName)) {
+            groups.set(groupName, {
+                name: groupName,
+                items: []
+            });
+        }
+
+        groups.get(groupName).items.push(item);
+    });
+
+    return [...groups.values()];
+  }
+
+  function getInventoryRoomName(item) {
+    let source = item.acquiredFrom;
+
+    while (source && source.id !== "player") {
+        if (world.rooms[source.id]) {
+            return source.name;
+        }
+
+        source = source.location;
+    }
+
+    return "";
+  }
+
+  function getInventoryOriginName(item) {
+    const source = item.acquiredFrom;
+
+    if (!source || world.rooms[source.id]) {
+        return "";
+    }
+
+    return source.name;
   }
 
   function renderActions() {
@@ -330,7 +664,10 @@ import {world} from './model.js';
         btn.className = "exit-node";
         btn.dataset.exit = dir;
         btn.dataset.slot = dir;
-        btn.textContent =  `${dir.toUpperCase()} - ${targetRoom?.name || "Unknown"}`;
+        btn.textContent = formatText(viewMessages.viewExitLabel, {
+            direction: dir.toUpperCase(),
+            room: targetRoom?.name || viewMessages.viewUnknown
+        });
 
         exitsMapEl.append(btn);
     })
@@ -339,7 +676,10 @@ import {world} from './model.js';
         btn.className = "exit-node";
         btn.dataset.exit = dir;
         btn.dataset.slot = dir;
-        btn.textContent = `${dir.toUpperCase()} - ${targetRoom?.name || "Unknown"}`;
+        btn.textContent = formatText(viewMessages.viewExitLabel, {
+            direction: dir.toUpperCase(),
+            room: targetRoom?.name || viewMessages.viewUnknown
+        });
         btn.disabled = true;
 
         exitsMapEl.append(btn);
@@ -347,9 +687,5 @@ import {world} from './model.js';
   }
   
   export function closeActiveModal() {
-    state.openModal = null;
-    modalOverlay.classList.add("hidden");
-    modalOverlay.setAttribute("aria-hidden", "true");
-    hintModal.classList.add("hidden");
-    exitsModal.classList.add("hidden");
+    closeModalImmediately();
 }

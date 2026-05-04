@@ -1,12 +1,12 @@
 import Container from "./Container.js";
 
 class Player extends Container {
-    constructor(data) {
+    constructor(data = {}) {
         super({
-            id: "player",
-            name: "Player",
-            description: "You",
-            location: "room"
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            location: data.location
         });
     }
 }

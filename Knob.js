@@ -5,6 +5,7 @@ class Knob extends Interactable {
         super(data);
         this.sides = data.sides || [];
         this.selectedSide = data.selectedSide || this.sides[0];
+        this.hasBeenTurned = false;
     }
 
     use(world, actionName) {
@@ -12,6 +13,7 @@ class Knob extends Interactable {
         const currentIndex = this.sides.indexOf(this.selectedSide);
         const nextIndex = (currentIndex + 1) % this.sides.length;
         this.selectedSide = this.sides[nextIndex];
+        this.hasBeenTurned = true;
     }
 }
 

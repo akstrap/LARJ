@@ -1,17 +1,20 @@
 import GameObject from "./GameObject.js"
+import { formatText } from "./TextTemplate.js";
 
 class Item extends GameObject {
     constructor(data) {
         super(data)
         this.usable = data.usable || false;
+        this.messages = data.messages || {};
     }
 
     take(world) {
+        this.acquiredFrom = this.location;
         this.location.removeChild(this);
         world.player.addChild(this);
         this.setLocation(world.player);
 
-        world.message = `You picked up the ${this.name}.`
+        world.message = formatText(this.messages.take, { name: this.name });
     }
 
     drop(world) {
@@ -19,7 +22,7 @@ class Item extends GameObject {
         world.currentRoom.addChild(this);
         this.setLocation(world.currentRoom);
 
-        world.message = `You dropped the ${this.name}.`
+        world.message = formatText(this.messages.drop, { name: this.name });
     }
 
     use(world) {
@@ -35,18 +38,18 @@ class Item extends GameObject {
 
         if (this.location === world.player) {
             actions.push({
-                name: `Drop ${this.name}`,
+                name: formatText(this.messages.actionDrop, { name: this.name }),
                 handler: (world) => this.drop(world)
             })
             if (this.usable) {
                 actions.push({
-                    name: `Use ${this.name}`,
+                    name: formatText(this.messages.actionUse, { name: this.name }),
                     handler: (world) => this.use(world)
                 })
             }
         } else {
             actions.push({
-                name: `Take ${this.name}`,
+                name: formatText(this.messages.actionTake, { name: this.name }),
                 handler: (world) => this.take(world)
             })
         }

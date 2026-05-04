@@ -7,6 +7,9 @@ class Gatherer extends Container {
         this.conditions = data.conditions || {};
         this.interactions = data.interact || {};
         this.hiddenContents = data.hiddenContents || [];
+        this.messages = {
+            invalidInteraction: data.messages?.invalidInteraction
+        };
     }
 
     interact(item, world) {
@@ -24,7 +27,7 @@ class Gatherer extends Container {
             }
         }
         else {
-            world.message = "I don't think those two items go together.";
+            world.message = this.messages.invalidInteraction;
         }
     }
 

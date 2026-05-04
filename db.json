@@ -16,6 +16,106 @@
             "rooms": ["square", "food-stall", "blacksmith"]
         }
     },
+    "messages": {
+        "initialWorldMessage": "You wake up...",
+        "controllerMove": "You moved {direction} to the {destination}",
+        "gathererInvalidInteraction": "I don't think those two items go together.",
+        "interactableDefaultAction": "Nothing happens.",
+        "itemTake": "You picked up the {name}.",
+        "itemDrop": "You dropped the {name}.",
+        "itemActionDrop": "Drop {name}",
+        "itemActionUse": "Use {name}",
+        "itemActionTake": "Take {name}",
+        "viewAlsoSee": "You also see: ",
+        "viewInventoryOrigin": "from {origin}",
+        "viewInventoryItemLabel": "{name}",
+        "viewInventoryItemWithOriginLabel": "{name} from {origin}",
+        "viewUnknown": "Unknown",
+        "viewExitLabel": "{direction} - {room}"
+    },
+    "player": {
+        "id": "player",
+        "name": "Player",
+        "description": "You",
+        "location": "room"
+    },
+    "hints": [
+        {
+            "id": "turn-knob",
+            "text": "Try the knob, then the west door.",
+            "condition": "hub-knob-unturned"
+        },
+        {
+            "id": "cycle-knob",
+            "text": "The knob has more than one destination.",
+            "condition": "hub-knob-turned"
+        },
+        {
+            "id": "castle-jewels",
+            "text": "The crown wants what is missing.",
+            "condition": "castle"
+        },
+        {
+            "id": "shack-cauldron",
+            "text": "Recipes matter near the cauldron.",
+            "condition": "shack"
+        },
+        {
+            "id": "village-mule",
+            "text": "Care for the mule completely.",
+            "condition": "village"
+        },
+        {
+            "id": "use-items",
+            "text": "Use held items on matching objects.",
+            "condition": "has-usable-item"
+        }
+    ],
+    "hintConditions": {
+        "hub-knob-unturned": {
+            "all": [
+                {
+                    "path": "currentRoom.id",
+                    "equals": "room"
+                },
+                {
+                    "path": "objects.knob.hasBeenTurned",
+                    "notEquals": true
+                }
+            ]
+        },
+        "hub-knob-turned": {
+            "all": [
+                {
+                    "path": "currentRoom.id",
+                    "equals": "room"
+                },
+                {
+                    "path": "objects.knob.hasBeenTurned",
+                    "equals": true
+                }
+            ]
+        },
+        "castle": {
+            "path": "currentRoom.id",
+            "in": ["great-hall", "throne-room", "bedroom", "bathroom", "courtyard"]
+        },
+        "shack": {
+            "path": "currentRoom.id",
+            "in": ["interior", "yard", "forest"]
+        },
+        "village": {
+            "path": "currentRoom.id",
+            "in": ["square", "food-stall", "blacksmith"]
+        },
+        "has-usable-item": {
+            "path": "player.contents",
+            "some": {
+                "path": "usable",
+                "equals": true
+            }
+        }
+    },
     "rooms": {
         "room": {
             "id": "room",
@@ -674,6 +774,16 @@
                 "harness": "You give the other end of the rope to the mule, so it is now free"
              },
              "conditions": {
+                "carrot-fed": {
+                    "contains": ["carrot"],
+                    "newDescription": "The mule is happily munching on the carrot. It still looks like it could eat more.",
+                    "reveal": []
+                },
+                "barley-fed": {
+                    "contains": ["barley"],
+                    "newDescription": "The mule is happily munching on the barley. It still looks like it could eat more.",
+                    "reveal": []
+                },
                 "fed": {
                     "contains": ["carrot", "barley"],
                     "newDescription": "The mule is happily munching on the carrot and barley.",

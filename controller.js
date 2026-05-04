@@ -1,5 +1,6 @@
-import { world } from "./model.js";
-import { initView, render, closeActiveModal } from "./view.js";
+import { world, setWorldMessages } from "./model.js";
+import { initView, render, closeActiveModal, setHintDefinitions, setViewMessages } from "./view.js";
+import { formatText } from "./TextTemplate.js";
 import Player from "./Player.js";
 import Item from "./Item.js";
 import Container from "./Container.js";
@@ -16,6 +17,9 @@ export async function init() {
 
     const resp = await fetch('./db.json')
     const data = await resp.json();
+    setWorldMessages(data.messages);
+    setViewMessages(data.messages);
+    setHintDefinitions(data.hints, data.hintConditions);
 
     createItems(data);
     createGatherers(data);
@@ -27,7 +31,7 @@ export async function init() {
     linkWorld();
 
     world.currentRoom = world.rooms["room"];
-    world.player = new Player();
+    world.player = new Player(data.player);
     world.selectedItem = null;
 
     render();
@@ -36,14 +40,28 @@ export async function init() {
 }
 
 function createItems(data) {
-    Object.values(data.items).forEach(data => {
-        world.objects[data.id] = new Item(data);
+    Object.values(data.items).forEach(itemData => {
+        world.objects[itemData.id] = new Item({
+            ...itemData,
+            messages: {
+                take: data.messages?.itemTake,
+                drop: data.messages?.itemDrop,
+                actionDrop: data.messages?.itemActionDrop,
+                actionUse: data.messages?.itemActionUse,
+                actionTake: data.messages?.itemActionTake
+            }
+        });
     })
 }
 
 function createGatherers(data) {
-    Object.values(data.gatherers).forEach(data => {
-        world.objects[data.id] = new Gatherer(data);
+    Object.values(data.gatherers).forEach(gathererData => {
+        world.objects[gathererData.id] = new Gatherer({
+            ...gathererData,
+            messages: {
+                invalidInteraction: data.messages?.gathererInvalidInteraction
+            }
+        });
     })
 }
 
@@ -54,11 +72,18 @@ function createContainers(data) {
 }
 
 function createInteractables(data) {
-    Object.values(data.interactables).forEach(data => {
-        if (data.sides) {
-            world.objects[data.id] = new Knob(data);
+    Object.values(data.interactables).forEach(interactableData => {
+        const hydratedData = {
+            ...interactableData,
+            messages: {
+                defaultAction: data.messages?.interactableDefaultAction
+            }
+        };
+
+        if (interactableData.sides) {
+            world.objects[interactableData.id] = new Knob(hydratedData);
         } else {
-            world.objects[data.id] = new Interactable(data);
+            world.objects[interactableData.id] = new Interactable(hydratedData);
         }
     })
 }
@@ -149,7 +174,10 @@ function handleExit(dir) {
     world.currentRoom = dest;
     world.selectedItem = null;
     world.selectedInventoryItem = null;
-    world.message = `You moved ${dir} to the ${dest.name}`
+    world.message = formatText(world.messages.controllerMove, {
+        direction: dir,
+        destination: dest.name
+    });
 
     closeActiveModal();
 
